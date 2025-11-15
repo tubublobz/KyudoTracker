@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kyudo Tracker V0.1</title>
+  <title>Kyudo Tracker</title>
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <h1>Kyudo Tracker</h1>
+  <h1>Kyudo Tracker v0.2 avec IndexDB</h1>
   <form id="sessionForm">
     <label>Tirs :</label>
     <input type="number" id="shots" min="0" required>
@@ -18,7 +18,7 @@
   </form>
   <h2>Historique</h2>
   <ul id="history"></ul>
-  <script src="app.js"></script>
   <script src="https://unpkg.com/dexie@3.2.4/dist/dexie.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
