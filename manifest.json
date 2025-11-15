@@ -9,13 +9,7 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/KyudoTracker/icons/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/KyudoTracker/icons/icon-512.png",
+      "src": "/KyudoTracker/icons/512_max.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
