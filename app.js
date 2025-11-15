@@ -1,3 +1,6 @@
+// ⚠️ IMPORTANT : Changez selon le nom de votre repo GitHub
+const BASE_PATH = '/KyudoTracker';
+
 // Enregistrement du Service Worker avec gestion d'erreurs
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
