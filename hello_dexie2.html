@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hello Dexie.js</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f0f0f0;
+    }
+    .box {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      margin: 20px 0;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    button {
+      background: #4CAF50;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 5px;
+    }
+    button:hover {
+      background: #45a049;
+    }
+    #messages {
+      list-style: none;
+      padding: 0;
+    }
+    #messages li {
+      background: #e3f2fd;
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🧪 Test Dexie.js</h1>
+  
+  <div class="box">
+    <h2>Étape 1 : Ajouter un message</h2>
+    <button onclick="ajouterMessage()">➕ Ajouter "Hello World"</button>
+  </div>
+  
+  <div class="box">
+    <h2>Étape 2 : Voir les messages</h2>
+    <button onclick="afficherMessages()">👀 Afficher tous les messages</button>
+    <ul id="messages"></ul>
+  </div>
+  
+  <div class="box">
+    <h2>Étape 3 : Tout effacer</h2>
+    <button onclick="effacerTout()" style="background: #f44336;">🗑️ Effacer tout</button>
+  </div>
+
+  <!-- Charger Dexie.js depuis le CDN -->
+  <script src="https://unpkg.com/dexie@3.2.4/dist/dexie.js"></script>
+  
+  <script>
+    // ========================================
+    // ÉTAPE 1 : Créer la base de données
+    // ========================================
+    
+    console.log('📦 Création de la base de données...');
+    
+    const db = new Dexie('HelloDexieDB');
+    
+    // Définir le schéma (version 1)
+    db.version(1).stores({
+      messages: '++id, texte, date'
+      // ++id = clé primaire qui s'auto-incrémente
+      // texte, date = colonnes indexées
+    });
+    
+    console.log('✅ Base de données créée !');
+    
+    // ========================================
+    // ÉTAPE 2 : Fonctions de base
+    // ========================================
+    
+    async function ajouterMessage() {
+      try {
+        // Ajouter un message avec la date actuelle
+        const id = await db.messages.add({
+          texte: 'Hello World ! 👋',
+          date: new Date()
+        });
+        
+        console.log('✅ Message ajouté avec l\'ID:', id);
+        alert('Message ajouté !');
+        
+        // Afficher automatiquement
+        afficherMessages();
+        
+      } catch (error) {
+        console.error('❌ Erreur:', error);
+        alert('Erreur lors de l\'ajout');
+      }
+    }
+    
+    async function afficherMessages() {
+      try {
+        // Récupérer TOUS les messages
+        const tousLesMessages = await db.messages.toArray();
+        
+        console.log('📋 Messages récupérés:', tousLesMessages);
+        
+        const liste = document.getElementById('messages');
+        liste.innerHTML = '';
+        
+        if (tousLesMessages.length === 0) {
+          liste.innerHTML = '<li>Aucun message pour le moment</li>';
+          return;
+        }
+        
+        // Afficher chaque message
+        tousLesMessages.forEach(msg => {
+          const li = document.createElement('li');
+          li.textContent = `#${msg.id} - ${msg.texte} (${msg.date.toLocaleString('fr-FR')})`;
+          liste.appendChild(li);
+        });
+        
+      } catch (error) {
+        console.error('❌ Erreur:', error);
+        alert('Erreur lors de la récupération');
+      }
+    }
+    
+    async function effacerTout() {
+      if (!confirm('Vraiment tout effacer ?')) {
+        return;
+      }
+      
+      try {
+        // Vider la table messages
+        await db.messages.clear();
+        
+        console.log('🗑️ Tout effacé !');
+        alert('Tout a été effacé !');
+        
+        afficherMessages();
+        
+      } catch (error) {
+        console.error('❌ Erreur:', error);
+        alert('Erreur lors de la suppression');
+      }
+    }
+    
+    // Afficher les messages au chargement
+    afficherMessages();
+  </script>
+</body>
+</html>
