@@ -1,3 +1,13 @@
+// ⭐ NOUVEAU : Créer la base de données
+const db = new Dexie('KyudoTrackerDB');
+
+// Définir le schéma
+db.version(1).stores({
+  sessions: '++id, date, shots, hits'
+});
+
+console.log('✅ Base de données IndexedDB créée');
+
 // ⚠️ IMPORTANT : Changez selon le nom de votre repo GitHub
 const BASE_PATH = '/KyudoTracker';
 
