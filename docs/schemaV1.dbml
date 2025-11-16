@@ -1,0 +1,68 @@
+// Use DBML to define your database structure
+// Docs: https://dbml.dbdiagram.io/docs
+
+Table session {
+  id integer [primary key]
+  date timestamp
+  lieu varchar
+  type varchar // Entrainement, Tournoi, Examen...
+  comment text // Commentaire sur la session
+}
+
+Table tir {
+  id integer [primary key]
+  typeCode varchar // lien vers type_tir -> code
+  // Resultat
+  tekichu boolean
+  x_pos integer
+  y_pos integer
+  scoring integer
+  // rajouter des détails tech dans une V2
+  // External Ids
+  sharei_id integer
+  arc_id integer
+  session_id integer
+
+}
+
+Table sharei {
+  id integer [primary key]
+
+  type varchar // Shinsa, Hitotsumato, MochiMato ...
+  zasha boolean
+  participants integer
+  position integer // Position personnelle dans le sharei
+  kaizoe integer // 0, 1 ou 2
+  comment text // Commentaire sur le sharei
+  // External indexes
+  session_id integer
+
+}
+
+Table arc {
+  id integer [primary key]
+  nom varchar
+  force float
+  categorie varchar // Nisun, Yonsun ...
+  materiau varchar // Fibre, Carbone, Bambou
+}
+
+Table type_tir {
+  id integer [primary key]
+  code varchar // maki , kinteki28, enteki60 
+  distance integer
+  diametre_cible integer
+  scoring boolean
+  makiwara boolean
+}
+
+// ========================================
+// RELATIONS
+// ========================================
+
+Ref: tir.session_id > session.id
+Ref: tir.sharei_id > sharei.id
+Ref: tir.arc_id > arc.id
+Ref: tir.typeCode > type_tir.code
+
+Ref: sharei.session_id > session.id
