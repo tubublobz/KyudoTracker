@@ -1,4 +1,4 @@
-const CACHE_NAME = "kyudo-cache-v6";
+const CACHE_NAME = "kyudo-cache-v7";
 
 const REPO_NAME = '/KyudoTracker'; // Nom du repo
 
@@ -7,6 +7,8 @@ const FILES_TO_CACHE = [
   `${REPO_NAME}/index.html`,
   `${REPO_NAME}/styles.css`,
   `${REPO_NAME}/app.js`,
+  `${REPO_NAME}/db/db.js`,
+  `${REPO_NAME}/db/seed-data.js`,
   `${REPO_NAME}/manifest.json`,
   `${REPO_NAME}/service-worker.js`
 ];
@@ -56,7 +58,7 @@ self.addEventListener("fetch", (evt) => {
         console.log('[Service Worker] Réponse depuis le cache:', evt.request.url);
         return cachedResponse;
       }
-      
+
       console.log('[Service Worker] Récupération depuis le réseau:', evt.request.url);
       return fetch(evt.request).catch((error) => {
         console.error('[Service Worker] Erreur réseau:', error);

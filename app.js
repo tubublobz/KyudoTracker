@@ -1,11 +1,9 @@
+import db from './db/db.js';
+
 // ⭐ Configuration de la base de données IndexedDB
-const db = new Dexie('KyudoTrackerDB');
+// (Gérée maintenant dans db/db.js)
 
-db.version(1).stores({
-  sessions: '++id, date, shots, hits'
-});
-
-console.log('✅ Base de données IndexedDB créée');
+console.log('✅ Base de données chargée depuis le module');
 
 // Configuration GitHub Pages
 const BASE_PATH = '/KyudoTracker';
@@ -16,7 +14,7 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register(`${BASE_PATH}/service-worker.js`, { scope: `${BASE_PATH}/` })
       .then((registration) => {
         console.log('✅ Service Worker enregistré avec succès:', registration.scope);
-        
+
         registration.addEventListener('updatefound', () => {
           console.log('🔄 Nouvelle version du Service Worker disponible');
           const newWorker = registration.installing;
@@ -30,11 +28,11 @@ if ('serviceWorker' in navigator) {
       .catch((error) => {
         console.error('❌ Erreur lors de l\'enregistrement du Service Worker:', error);
       });
-    
+
     window.addEventListener('online', () => {
       console.log('📶 Connexion rétablie');
     });
-    
+
     window.addEventListener('offline', () => {
       console.log('📵 Mode hors-ligne');
     });
@@ -51,37 +49,37 @@ const form = document.getElementById("sessionForm");
 async function loadHistory() {
   // Récupérer toutes les sessions, triées par date décroissante
   const sessions = await db.sessions.orderBy('date').reverse().toArray();
-  
+
   const historyList = document.getElementById("history");
   historyList.innerHTML = "";
-  
+
   if (sessions.length === 0) {
     historyList.innerHTML = "<li>Aucune session enregistrée</li>";
     return;
   }
-  
+
   sessions.forEach(s => {
     const li = document.createElement("li");
     li.textContent = `${s.date.toLocaleString('fr-FR')} — Tirs: ${s.shots}, Hits: ${s.hits}`;
     historyList.appendChild(li);
   });
-  
+
   console.log(`📋 ${sessions.length} session(s) affichée(s)`);
 }
 
 // ⭐ MODIFIÉ : Enregistrer dans IndexedDB
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
-  
+
   const shots = parseInt(document.getElementById("shots").value);
   const hits = parseInt(document.getElementById("hits").value);
-  
+
   // Validation
   if (hits > shots) {
     alert("Le nombre de hits ne peut pas dépasser le nombre de tirs !");
     return;
   }
-  
+
   try {
     // Ajouter dans IndexedDB
     await db.sessions.add({
@@ -89,15 +87,15 @@ form.addEventListener("submit", async (e) => {
       shots: shots,
       hits: hits
     });
-    
+
     console.log('✅ Session ajoutée : Tirs=' + shots + ', Hits=' + hits);
-    
+
     // Réinitialiser le formulaire
     form.reset();
-    
+
     // Recharger l'historique
     await loadHistory();
-    
+
   } catch (error) {
     console.error('❌ Erreur lors de l\'ajout:', error);
     alert('Erreur lors de l\'enregistrement de la session');
