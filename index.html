@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,18 +9,44 @@
   <link rel="stylesheet" href="styles.css">
   <link rel="icon" type="image/png" href="icons/512_max.png">
 </head>
+
 <body>
-  <h1>Kyudo Tracker v0.3 avec IndexDB</h1>
-  <form id="sessionForm">
-    <label>Tirs :</label>
-    <input type="number" id="shots" min="0" required>
-    <label>Hits :</label>
-    <input type="number" id="hits" min="0" required>
-    <button type="submit">Enregistrer</button>
-  </form>
+  <h1>Kyudo Tracker v0.4 avec Makiwara</h1>
+  <div id="app-container">
+    <!-- Section Makiwara -->
+    <section class="control-group">
+      <h2>Makiwara</h2>
+      <button id="btn-makiwara" class="btn-icon">
+        <img src="icons/makiwara.png" alt="Makiwara">
+        <span id="count-makiwara" class="badge">0</span>
+      </button>
+    </section>
+
+    <!-- Section Kinteki -->
+    <section class="control-group">
+      <h2>Kinteki</h2>
+      <div class="buttons-row">
+        <button id="btn-yosh" class="btn-icon">
+          <img src="icons/yosh.png" alt="Touché">
+        </button>
+        <button id="btn-batsu" class="btn-icon">
+          <img src="icons/batsu.png" alt="Raté">
+        </button>
+      </div>
+      <div class="stats-display">
+        <span id="count-kinteki">0</span> tirs | <span id="count-hits">0</span> hits
+      </div>
+    </section>
+
+    <!-- Actions -->
+    <section class="actions">
+      <button id="btn-save" class="btn-primary" disabled>Enregistrer la session</button>
+    </section>
+  </div>
   <h2>Historique</h2>
   <ul id="history"></ul>
   <script src="https://unpkg.com/dexie@3.2.4/dist/dexie.js"></script>
   <script type="module" src="app.js"></script>
 </body>
+
 </html>
