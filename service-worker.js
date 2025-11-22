@@ -1,16 +1,16 @@
 const CACHE_NAME = "kyudo-cache-v7";
 
-const REPO_NAME = '/KyudoTracker'; // Nom du repo
+const REPO_NAME = ''; // Nom du repo (vide pour local ou racine)
 
 const FILES_TO_CACHE = [
-  `${REPO_NAME}/`,
-  `${REPO_NAME}/index.html`,
-  `${REPO_NAME}/styles.css`,
-  `${REPO_NAME}/app.js`,
-  `${REPO_NAME}/db/db.js`,
-  `${REPO_NAME}/db/seed-data.js`,
-  `${REPO_NAME}/manifest.json`,
-  `${REPO_NAME}/service-worker.js`
+  `./`,
+  `./index.html`,
+  `./styles.css`,
+  `./app.js`,
+  `./db/db.js`,
+  `./db/seed-data.js`,
+  `./manifest.json`,
+  `./service-worker.js`
 ];
 
 // Installation : mise en cache de tous les fichiers
