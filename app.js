@@ -75,18 +75,28 @@ function updateUI() {
   btnSave.disabled = (currentSession.makiwara === 0 && currentSession.kinteki.length === 0);
 }
 
+// Helper pour l'animation bouncy
+function triggerBounce(element) {
+  element.classList.remove('bouncy');
+  void element.offsetWidth; // Trigger reflow
+  element.classList.add('bouncy');
+}
+
 // Gestionnaires d'événements
 btnMakiwara.addEventListener('click', () => {
+  triggerBounce(btnMakiwara);
   currentSession.makiwara++;
   updateUI();
 });
 
 btnYosh.addEventListener('click', () => {
+  triggerBounce(btnYosh);
   currentSession.kinteki.push({ result: true });
   updateUI();
 });
 
 btnBatsu.addEventListener('click', () => {
+  triggerBounce(btnBatsu);
   currentSession.kinteki.push({ result: false });
   updateUI();
 });

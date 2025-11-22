@@ -190,3 +190,26 @@ h2 {
   border-bottom-right-radius: 8px;
   border-bottom: none;
 }
+
+/* Animation Keyframes */
+@keyframes bounce {
+  0% {
+    transform: scale(1);
+  }
+
+  40% {
+    transform: scale(0.92);
+  }
+
+  60% {
+    transform: scale(1.05);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+.bouncy {
+  animation: bounce 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
