@@ -197,12 +197,8 @@ h2 {
     transform: scale(1);
   }
 
-  40% {
-    transform: scale(0.92);
-  }
-
-  60% {
-    transform: scale(1.05);
+  50% {
+    transform: scale(0.96);
   }
 
   100% {
@@ -211,5 +207,5 @@ h2 {
 }
 
 .bouncy {
-  animation: bounce 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  animation: bounce 0.2s ease-out;
 }
