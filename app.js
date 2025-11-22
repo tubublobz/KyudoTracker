@@ -6,7 +6,7 @@ import db from './db/db.js';
 console.log('✅ Base de données chargée depuis le module');
 
 // Configuration GitHub Pages
-const BASE_PATH = '/KyudoTracker';
+const BASE_PATH = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? '' : '/KyudoTracker';
 
 // Service Worker (inchangé)
 if ('serviceWorker' in navigator) {
