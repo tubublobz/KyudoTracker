@@ -14,22 +14,22 @@
   <h1>Kyudo Tracker v0.4 avec Makiwara</h1>
   <div id="app-container">
     <!-- Section Makiwara -->
-    <section class="control-group">
+    <button id="btn-makiwara" class="control-group btn-card full-width">
       <h2>Makiwara</h2>
-      <button id="btn-makiwara" class="btn-icon">
+      <div class="icon-container">
         <img src="icons/makiwara.png" alt="Makiwara">
         <span id="count-makiwara" class="badge">0</span>
-      </button>
-    </section>
+      </div>
+    </button>
 
     <!-- Section Kinteki -->
     <section class="control-group">
       <h2>Kinteki</h2>
       <div class="buttons-row">
-        <button id="btn-yosh" class="btn-icon">
+        <button id="btn-yosh" class="btn-icon expanded-hit">
           <img src="icons/yosh.png" alt="Touché">
         </button>
-        <button id="btn-batsu" class="btn-icon">
+        <button id="btn-batsu" class="btn-icon expanded-hit">
           <img src="icons/batsu.png" alt="Raté">
         </button>
       </div>
