@@ -157,7 +157,8 @@
 
 ### Phase 1.5 - Export/Import (PRIORITÉ une fois la structure stable)
 **Objectif :** Ne plus perdre ses données !
-
+- Alternative : mettre à jour la PWA (voir fichier PWAUpdate.md)
+ 
 - [ ] **Export JSON**
   - Bouton "Exporter mes données" dans le menu ☰
   - Télécharge un fichier JSON avec toutes les séances
