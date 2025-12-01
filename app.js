@@ -58,11 +58,16 @@ if ('serviceWorker' in navigator) {
 function showUpdateNotification(worker) {
   const notification = document.getElementById('update-notification');
   const updateBtn = document.getElementById('update-btn');
+  const closeBtn = document.getElementById('close-notification-btn');
 
   notification.classList.remove('hidden');
 
   updateBtn.addEventListener('click', () => {
     worker.postMessage({ type: 'SKIP_WAITING' });
+    notification.classList.add('hidden');
+  });
+
+  closeBtn.addEventListener('click', () => {
     notification.classList.add('hidden');
   });
 }

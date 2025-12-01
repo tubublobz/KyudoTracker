@@ -209,12 +209,13 @@ h2 {
 .bouncy {
   animation: bounce 0.2s ease-out;
 }
+
 /* Update Notification */
 .update-notification {
   position: fixed;
   bottom: 20px;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translateX(-50%) translateY(0);
   background-color: #333;
   color: white;
   padding: 15px 20px;
@@ -227,15 +228,30 @@ h2 {
   width: 90%;
   max-width: 400px;
   justify-content: space-between;
+  transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+  opacity: 1;
 }
 
 .update-notification.hidden {
-  display: none;
+  display: flex;
+  /* Keep flex to maintain layout during transition */
+  transform: translateX(-50%) translateY(150%);
+  /* Slide down */
+  opacity: 0;
+  pointer-events: none;
+  /* Prevent clicks when hidden */
 }
 
 .update-notification p {
   margin: 0;
   font-size: 0.95rem;
+  flex: 1;
+}
+
+.notification-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .btn-update {
@@ -251,4 +267,22 @@ h2 {
 
 .btn-update:hover {
   background-color: #0056b3;
+}
+
+.btn-close {
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0 5px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.btn-close:hover {
+  color: white;
 }

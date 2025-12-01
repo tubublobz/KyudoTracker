@@ -11,7 +11,7 @@
 </head>
 
 <body>
-  <h1>Kyudo Tracker v0.5.2 avec boutons bouncy (et cachev13)</h1>
+  <h1>Kyudo Tracker v0.5.2 avec update manager (et cachev14)</h1>
   <div id="app-container">
     <!-- Section Makiwara -->
     <button id="btn-makiwara" class="control-group btn-card full-width">
@@ -48,7 +48,10 @@
   <script src="https://unpkg.com/dexie@3.2.4/dist/dexie.js"></script>
   <div id="update-notification" class="update-notification hidden">
     <p>Une nouvelle version est disponible.</p>
-    <button id="update-btn" class="btn-update">Mettre à jour</button>
+    <div class="notification-actions">
+      <button id="update-btn" class="btn-update">Mettre à jour</button>
+      <button id="close-notification-btn" class="btn-close" aria-label="Fermer">&times;</button>
+    </div>
   </div>
 
   <script type="module" src="app.js"></script>
