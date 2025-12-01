@@ -1,4 +1,4 @@
-const CACHE_NAME = "kyudo-cache-v11";
+const CACHE_NAME = "kyudo-cache-v12";
 
 const REPO_NAME = ''; // Nom du repo (vide pour local ou racine)
 
@@ -18,8 +18,18 @@ self.addEventListener("install", (evt) => {
   console.log('[Service Worker] Installation en cours... ' + CACHE_NAME);
   evt.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log('[Service Worker] Mise en cache des fichiers');
-      return cache.addAll(FILES_TO_CACHE);
+      console.log('[Service Worker] Mise en cache des fichiers (Forced Reload)');
+      // On force le téléchargement depuis le réseau pour éviter le cache HTTP du navigateur
+      return Promise.all(
+        FILES_TO_CACHE.map((url) => {
+          return fetch(url, { cache: 'reload' }).then((response) => {
+            if (!response.ok) {
+              throw new Error(`Erreur chargement ${url}: ${response.statusText}`);
+            }
+            return cache.put(url, response);
+          });
+        })
+      );
     }).then(() => {
       console.log('[Service Worker] Installation réussie');
       // return self.skipWaiting(); // Suppression de l'activation automatique
