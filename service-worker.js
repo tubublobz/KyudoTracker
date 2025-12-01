@@ -1,4 +1,4 @@
-const CACHE_NAME = "kyudo-cache-v7";
+const CACHE_NAME = "kyudo-cache-v8";
 
 const REPO_NAME = ''; // Nom du repo (vide pour local ou racine)
 
