@@ -1,4 +1,4 @@
-const CACHE_NAME = "kyudo-cache-v8";
+const CACHE_NAME = "kyudo-cache-v9";
 
 const REPO_NAME = ''; // Nom du repo (vide pour local ou racine)
 
@@ -36,7 +36,7 @@ self.addEventListener('message', (event) => {
 
 // Activation : nettoyage des anciens caches
 self.addEventListener("activate", (evt) => {
-  console.log('[Service Worker] Activation en cours...');
+  console.log('[Service Worker] Activation en cours... ' + CACHE_NAME);
   evt.waitUntil(
     caches.keys().then((keyList) => {
       return Promise.all(keyList.map((key) => {
