@@ -209,3 +209,46 @@ h2 {
 .bouncy {
   animation: bounce 0.2s ease-out;
 }
+/* Update Notification */
+.update-notification {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #333;
+  color: white;
+  padding: 15px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  z-index: 1000;
+  width: 90%;
+  max-width: 400px;
+  justify-content: space-between;
+}
+
+.update-notification.hidden {
+  display: none;
+}
+
+.update-notification p {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.btn-update {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.btn-update:hover {
+  background-color: #0056b3;
+}

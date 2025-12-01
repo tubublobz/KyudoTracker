@@ -9,18 +9,26 @@ console.log('✅ Base de données chargée depuis le module');
 const BASE_PATH = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? '' : '/KyudoTracker';
 
 // Service Worker (inchangé)
+// Service Worker
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register(`${BASE_PATH}/service-worker.js`, { scope: `${BASE_PATH}/` })
       .then((registration) => {
         console.log('✅ Service Worker enregistré avec succès:', registration.scope);
 
+        // Vérifier s'il y a déjà un worker en attente
+        if (registration.waiting) {
+          showUpdateNotification(registration.waiting);
+        }
+
         registration.addEventListener('updatefound', () => {
           console.log('🔄 Nouvelle version du Service Worker disponible');
           const newWorker = registration.installing;
           newWorker.addEventListener('statechange', () => {
-            if (newWorker.state === 'activated') {
-              console.log('✅ Nouveau Service Worker activé');
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              // Nouveau worker installé et en attente
+              console.log('⏳ Nouveau Service Worker en attente d\'activation');
+              showUpdateNotification(newWorker);
             }
           });
         });
@@ -29,6 +37,14 @@ if ('serviceWorker' in navigator) {
         console.error('❌ Erreur lors de l\'enregistrement du Service Worker:', error);
       });
 
+    // Recharger la page quand le nouveau SW prend le contrôle
+    let refreshing;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (refreshing) return;
+      window.location.reload();
+      refreshing = true;
+    });
+
     window.addEventListener('online', () => {
       console.log('📶 Connexion rétablie');
     });
@@ -36,6 +52,18 @@ if ('serviceWorker' in navigator) {
     window.addEventListener('offline', () => {
       console.log('📵 Mode hors-ligne');
     });
+  });
+}
+
+function showUpdateNotification(worker) {
+  const notification = document.getElementById('update-notification');
+  const updateBtn = document.getElementById('update-btn');
+
+  notification.classList.remove('hidden');
+
+  updateBtn.addEventListener('click', () => {
+    worker.postMessage({ type: 'SKIP_WAITING' });
+    notification.classList.add('hidden');
   });
 }
 

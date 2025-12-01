@@ -22,9 +22,16 @@ self.addEventListener("install", (evt) => {
       return cache.addAll(FILES_TO_CACHE);
     }).then(() => {
       console.log('[Service Worker] Installation réussie');
-      return self.skipWaiting(); // Active immédiatement le nouveau SW
+      // return self.skipWaiting(); // Suppression de l'activation automatique
     })
   );
+});
+
+// Écouter le message pour forcer l'activation
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });
 
 // Activation : nettoyage des anciens caches
