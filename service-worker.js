@@ -1,4 +1,4 @@
-const CACHE_NAME = "kyudo-cache-v9";
+const CACHE_NAME = "kyudo-cache-v10";
 
 const REPO_NAME = ''; // Nom du repo (vide pour local ou racine)
 
@@ -15,7 +15,7 @@ const FILES_TO_CACHE = [
 
 // Installation : mise en cache de tous les fichiers
 self.addEventListener("install", (evt) => {
-  console.log('[Service Worker] Installation en cours...');
+  console.log('[Service Worker] Installation en cours... ' + CACHE_NAME);
   evt.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       console.log('[Service Worker] Mise en cache des fichiers');
