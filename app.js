@@ -1,3 +1,4 @@
+import DatabaseService from './src/services/database.js';
 import db from './db/db.js';
 
 // ⭐ Configuration de la base de données IndexedDB
@@ -73,10 +74,6 @@ function showUpdateNotification(worker) {
 }
 
 // ========================================
-// Fonctions avec IndexedDB
-// ========================================
-
-// ========================================
 // Fonctions avec IndexedDB (V2)
 // ========================================
 
@@ -137,60 +134,18 @@ btnBatsu.addEventListener('click', () => {
 // Enregistrer la session
 btnSave.addEventListener('click', async () => {
   try {
-    const now = new Date();
-
-    // 1. Créer la session
-    const sessionId = await db.session.add({
-      date: now,
-      lieu: 'Dojo', // Valeur par défaut pour l'instant
-      type: 'entrainement'
-    });
-
-    // 2. Enregistrer les tirs Makiwara
-    if (currentSession.makiwara > 0) {
-      // On pourrait optimiser en stockant juste le nombre, mais pour l'instant on suit la logique "un tir = une entrée" si on veut être précis,
-      // OU on crée des entrées de type 'maki'.
-      // Le schéma V2 a une table 'tir'.
-      // Récupérer l'ID du type 'maki'
-      const typeMaki = await db.type_tir.where('code').equals('maki').first();
-
-      if (typeMaki) {
-        const makiTirs = Array(currentSession.makiwara).fill({
-          session_id: sessionId,
-          typeCode: 'maki'
-        });
-        await db.tir.bulkAdd(makiTirs);
-      }
-    }
-
-    // 3. Enregistrer les tirs Kinteki
-    if (currentSession.kinteki.length > 0) {
-      const typeKinteki = await db.type_tir.where('code').equals('kinteki28').first();
-
-      if (typeKinteki) {
-        const kintekiTirs = currentSession.kinteki.map(t => ({
-          session_id: sessionId,
-          typeCode: 'kinteki28',
-          result: t.result // Note: le schéma V2 initial n'avait pas explicitement 'result' dans 'tir' dans db.js, vérifions...
-          // Attends, db.js dit: tir: '++id, session_id, sharei_id, arc_id, typeCode'
-          // Il manque le champ 'result' ou 'hit' dans la définition de l'index, mais Dexie stocke tout l'objet.
-          // Cependant, pour requêter efficacement, il vaudrait mieux l'indexer.
-          // On va l'ajouter à l'objet quand même.
-        }));
-        await db.tir.bulkAdd(kintekiTirs);
-      }
-    }
-
-    console.log('✅ Session enregistrée avec succès');
-
-    // Réinitialiser
+    // Appel au service
+    await DatabaseService.saveSession(currentSession);
+    console.log('✅ Session enregistrée');
+    
+    // Réinitialiser la session
     currentSession = { makiwara: 0, kinteki: [] };
     updateUI();
     await loadHistory();
-
+    
   } catch (error) {
-    console.error('❌ Erreur lors de l\'enregistrement:', error);
-    alert('Erreur lors de l\'enregistrement de la session');
+    console.error('❌ Erreur:', error);
+    alert('Erreur lors de l\'enregistrement');
   }
 });
 
