@@ -131,7 +131,7 @@ btnBatsu.addEventListener('click', () => {
   updateUI();
 });
 
-// Enregistrer la session
+// Enregistrer la session 
 btnSave.addEventListener('click', async () => {
   try {
     // Appel au service
@@ -152,29 +152,28 @@ btnSave.addEventListener('click', async () => {
 // Charger l'historique (V2)
 async function loadHistory() {
   historyList.innerHTML = "";
-
-  // Récupérer les sessions récentes
-  const sessions = await db.session.orderBy('date').reverse().limit(10).toArray();
-
+  
+  // Appeler le service
+  const sessions = await DatabaseService.loadHistory();
+  
   if (sessions.length === 0) {
     historyList.innerHTML = "<li>Aucune session enregistrée</li>";
     return;
   }
-
-  for (const s of sessions) {
-    // Compter les tirs associés
-    const tirs = await db.tir.where('session_id').equals(s.id).toArray();
-
-    const makiCount = tirs.filter(t => t.typeCode === 'maki').length;
-    const kintekiTirs = tirs.filter(t => t.typeCode === 'kinteki28');
-    const kintekiCount = kintekiTirs.length;
-    const hits = kintekiTirs.filter(t => t.result === true).length;
-
+  
+  // Afficher chaque session
+  for (const session of sessions) {
     const li = document.createElement("li");
-    let text = `${s.date.toLocaleString('fr-FR')}`;
-    if (makiCount > 0) text += ` — Makiwara: ${makiCount}`;
-    if (kintekiCount > 0) text += ` — Kinteki: ${hits}/${kintekiCount}`;
-
+    let text = `${session.date.toLocaleString('fr-FR')}`;
+    
+    if (session.stats.makiwara > 0) {
+      text += ` — Makiwara: ${session.stats.makiwara}`;
+    }
+    
+    if (session.stats.kintekiTotal > 0) {
+      text += ` — Kinteki: ${session.stats.kintekiHits}/${session.stats.kintekiTotal}`;
+    }
+    
     li.textContent = text;
     historyList.appendChild(li);
   }
