@@ -3,9 +3,9 @@ import { seedDatabase } from './seed-data.js';
 const db = new Dexie('KyudoTrackerDB');
 
 // Définition du schéma V2 (basé sur schemaV1.dbml)
-db.version(2).stores({
+db.version(3).stores({
     session: '++id, date, lieu, type',
-    tir: '++id, session_id, sharei_id, arc_id, typeCode',
+    tir: '++id, session_id, sharei_id, arc_id, typeCode, result',
     sharei: '++id, session_id',
     arc: '++id, nom',
     type_tir: '++id, code'
