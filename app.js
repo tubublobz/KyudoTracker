@@ -1,5 +1,5 @@
 import DatabaseService from './src/services/database.js';
-import db from './db/db.js';
+import * as UI from './src/ui/components.js';
 
 // ⭐ Configuration de la base de données IndexedDB
 // (Gérée maintenant dans db/db.js)
@@ -19,7 +19,7 @@ if ('serviceWorker' in navigator) {
 
         // Vérifier s'il y a déjà un worker en attente
         if (registration.waiting) {
-          showUpdateNotification(registration.waiting);
+          UI.showUpdateNotification(registration.waiting);
         }
 
         registration.addEventListener('updatefound', () => {
@@ -29,7 +29,7 @@ if ('serviceWorker' in navigator) {
             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
               // Nouveau worker installé et en attente
               console.log('⏳ Nouveau Service Worker en attente d\'activation');
-              showUpdateNotification(newWorker);
+              UI.showUpdateNotification(newWorker);
             }
           });
         });
@@ -55,24 +55,6 @@ if ('serviceWorker' in navigator) {
     });
   });
 }
-
-function showUpdateNotification(worker) {
-  const notification = document.getElementById('update-notification');
-  const updateBtn = document.getElementById('update-btn');
-  const closeBtn = document.getElementById('close-notification-btn');
-
-  notification.classList.remove('hidden');
-
-  updateBtn.addEventListener('click', () => {
-    worker.postMessage({ type: 'SKIP_WAITING' });
-    notification.classList.add('hidden');
-  });
-
-  closeBtn.addEventListener('click', () => {
-    notification.classList.add('hidden');
-  });
-}
-
 // ========================================
 // Fonctions avec IndexedDB (V2)
 // ========================================
@@ -85,50 +67,28 @@ let currentSession = {
 
 // Éléments du DOM
 const btnMakiwara = document.getElementById('btn-makiwara');
-const countMakiwara = document.getElementById('count-makiwara');
 const btnYosh = document.getElementById('btn-yosh');
 const btnBatsu = document.getElementById('btn-batsu');
-const countKinteki = document.getElementById('count-kinteki');
-const countHits = document.getElementById('count-hits');
 const btnSave = document.getElementById('btn-save');
-const historyList = document.getElementById('history');
 
-// Mise à jour de l'affichage
-function updateUI() {
-  countMakiwara.textContent = currentSession.makiwara;
-  countKinteki.textContent = currentSession.kinteki.length;
-
-  const hits = currentSession.kinteki.filter(t => t.result).length;
-  countHits.textContent = hits;
-
-  // Activer le bouton enregistrer s'il y a au moins un tir
-  btnSave.disabled = (currentSession.makiwara === 0 && currentSession.kinteki.length === 0);
-}
-
-// Helper pour l'animation bouncy
-function triggerBounce(element) {
-  element.classList.remove('bouncy');
-  void element.offsetWidth; // Trigger reflow
-  element.classList.add('bouncy');
-}
 
 // Gestionnaires d'événements
 btnMakiwara.addEventListener('click', () => {
-  triggerBounce(btnMakiwara);
+  UI.triggerBounce(btnMakiwara);
   currentSession.makiwara++;
-  updateUI();
+  UI.updateCounters(currentSession);
 });
 
 btnYosh.addEventListener('click', () => {
-  triggerBounce(btnYosh);
+  UI.triggerBounce(btnYosh);
   currentSession.kinteki.push({ result: true });
-  updateUI();
+  UI.updateCounters(currentSession);
 });
 
 btnBatsu.addEventListener('click', () => {
-  triggerBounce(btnBatsu);
+  UI.triggerBounce(btnBatsu);
   currentSession.kinteki.push({ result: false });
-  updateUI();
+  UI.updateCounters(currentSession);
 });
 
 // Enregistrer la session 
@@ -137,52 +97,28 @@ btnSave.addEventListener('click', async () => {
     // Appel au service
     await DatabaseService.saveSession(currentSession);
     console.log('✅ Session enregistrée');
-    
+
     // Réinitialiser la session
     currentSession = { makiwara: 0, kinteki: [] };
-    updateUI();
+    UI.updateCounters(currentSession);
     await loadHistory();
-    
+
   } catch (error) {
     console.error('❌ Erreur:', error);
     alert('Erreur lors de l\'enregistrement');
   }
 });
 
-// Charger l'historique (V2)
+// Charger l'historique (V3)
 async function loadHistory() {
-  historyList.innerHTML = "";
-  
-  // Appeler le service
   const sessions = await DatabaseService.loadHistory();
-  
-  if (sessions.length === 0) {
-    historyList.innerHTML = "<li>Aucune session enregistrée</li>";
-    return;
-  }
-  
-  // Afficher chaque session
-  for (const session of sessions) {
-    const li = document.createElement("li");
-    let text = `${session.date.toLocaleString('fr-FR')}`;
-    
-    if (session.stats.makiwara > 0) {
-      text += ` — Makiwara: ${session.stats.makiwara}`;
-    }
-    
-    if (session.stats.kintekiTotal > 0) {
-      text += ` — Kinteki: ${session.stats.kintekiHits}/${session.stats.kintekiTotal}`;
-    }
-    
-    li.textContent = text;
-    historyList.appendChild(li);
-  }
+  UI.displayHistory(sessions);
 }
 
 // Initialisation
 document.addEventListener('DOMContentLoaded', async () => {
   console.log('🚀 Chargement de l\'application...');
-  updateUI();
+  UI.updateCounters(currentSession);
   await loadHistory();
   console.log('✅ Application prête !');
 });
