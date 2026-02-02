@@ -1,5 +1,6 @@
 import DatabaseService from './src/services/database.js';
 import * as UI from './src/ui/components.js';
+import Session from './src/utils/Session.js'
 
 // ⭐ Configuration de la base de données IndexedDB
 // (Gérée maintenant dans db/db.js)
@@ -60,10 +61,7 @@ if ('serviceWorker' in navigator) {
 // ========================================
 
 // État de la session en cours
-let currentSession = {
-  makiwara: 0,
-  kinteki: [] // Tableau d'objets { result: boolean }
-};
+let currentSession = new Session();
 
 // Éléments du DOM
 const btnMakiwara = document.getElementById('btn-makiwara');
@@ -75,19 +73,19 @@ const btnSave = document.getElementById('btn-save');
 // Gestionnaires d'événements
 btnMakiwara.addEventListener('click', () => {
   UI.triggerBounce(btnMakiwara);
-  currentSession.makiwara++;
+  currentSession.addMakiwara();
   UI.updateCounters(currentSession);
 });
 
 btnYosh.addEventListener('click', () => {
   UI.triggerBounce(btnYosh);
-  currentSession.kinteki.push({ result: true });
+  currentSession.addKinteki(true);
   UI.updateCounters(currentSession);
 });
 
 btnBatsu.addEventListener('click', () => {
   UI.triggerBounce(btnBatsu);
-  currentSession.kinteki.push({ result: false });
+  currentSession.addKinteki(false);
   UI.updateCounters(currentSession);
 });
 
@@ -99,7 +97,7 @@ btnSave.addEventListener('click', async () => {
     console.log('✅ Session enregistrée');
 
     // Réinitialiser la session
-    currentSession = { makiwara: 0, kinteki: [] };
+    currentSession = new Session()
     UI.updateCounters(currentSession);
     await loadHistory();
 
