@@ -9,8 +9,7 @@ class Session {
     }
 
     removeMakiwara() {
-        if (this.makiwara > 0)
-            this.makiwara--;
+        if (this.makiwara > 0) { this.makiwara--; }
     }
 
     addKinteki(isHit) {
@@ -22,10 +21,7 @@ class Session {
     }
 
     isEmpty() {
-        if (this.makiwara === 0 && this.kinteki.length === 0)
-            return true;
-        else
-            return false
+        return this.makiwara === 0 && this.kinteki.length === 0;
     }
 
     reset() {

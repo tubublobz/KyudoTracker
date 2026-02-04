@@ -1,6 +1,6 @@
 import DatabaseService from './src/services/database.js';
 import * as UI from './src/ui/components.js';
-import Session from './src/utils/Session.js'
+import Session from './src/models/Session.js'
 
 // ⭐ Configuration de la base de données IndexedDB
 // (Gérée maintenant dans db/db.js)
@@ -93,11 +93,11 @@ btnBatsu.addEventListener('click', () => {
 btnSave.addEventListener('click', async () => {
   try {
     // Appel au service
-    await DatabaseService.saveSession(currentSession);
+    await DatabaseService.saveSession(currentSession.toData());
     console.log('✅ Session enregistrée');
 
     // Réinitialiser la session
-    currentSession = new Session()
+    currentSession.reset();
     UI.updateCounters(currentSession);
     await loadHistory();
 
