@@ -1,6 +1,7 @@
 {
   "name": "Kyudo Tracker",
   "short_name": "Kyudo Tracker",
+  "description": "Application de suivi d'entraînement au Kyudo",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

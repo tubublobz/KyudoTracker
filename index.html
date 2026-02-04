@@ -11,7 +11,8 @@
 </head>
 
 <body>
-  <h1>Kyudo Tracker v0.6 avec refacto management db</h1>
+  <h1>Kyudo Tracker</h1>
+  
   <div id="app-container">
     <!-- Section Makiwara -->
     <button id="btn-makiwara" class="control-group btn-card full-width">
@@ -43,9 +44,14 @@
       <button id="btn-save" class="btn-primary" disabled>Enregistrer la session</button>
     </section>
   </div>
-  <h2>Historique</h2>
-  <ul id="history"></ul>
-  <script src="https://unpkg.com/dexie@3.2.4/dist/dexie.js"></script>
+
+  <!-- Historique -->
+  <section class="history-section">
+    <h2>Historique</h2>
+    <ul id="history"></ul>
+  </section>
+
+  <!-- Notification de mise à jour -->
   <div id="update-notification" class="update-notification hidden">
     <p>Une nouvelle version est disponible.</p>
     <div class="notification-actions">
@@ -54,6 +60,8 @@
     </div>
   </div>
 
+  <!-- Scripts -->
+  <script src="https://unpkg.com/dexie@3.2.4/dist/dexie.js"></script>
   <script type="module" src="app.js"></script>
 </body>
 
