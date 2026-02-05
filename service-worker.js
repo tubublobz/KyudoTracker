@@ -1,16 +1,31 @@
-const CACHE_NAME = "kyudo-cache-v15";
-
-const REPO_NAME = ''; // Nom du repo (vide pour local ou racine)
+const CACHE_NAME = "kyudo-cache-v16";  // A incrémenter à chaque release
 
 const FILES_TO_CACHE = [
-  `./`,
-  `./index.html`,
-  `./styles.css`,
-  `./app.js`,
-  `./db/db.js`,
-  `./db/seed-data.js`,
-  `./manifest.json`,
-  `./service-worker.js`
+  './',
+  './index.html',
+  './styles.css',
+  './app.js',
+  './manifest.json',
+  
+  // Database
+  './db/db.js',
+  './db/seed-data.js',
+  
+  // Source files
+  './src/models/Session.js',
+  './src/services/database.js',
+  './src/ui/components.js',
+  './src/ui/notifications.js',
+  './src/utils/serviceWorker.js',
+  
+  // Icons (ajoute toutes celles que tu utilises)
+  './icons/makiwara.png',
+  './icons/yosh.png',
+  './icons/batsu.png',
+  './icons/512_max.png',
+  
+  // External dependencies
+  'https://unpkg.com/dexie@3.2.4/dist/dexie.js'
 ];
 
 // Installation : mise en cache de tous les fichiers
