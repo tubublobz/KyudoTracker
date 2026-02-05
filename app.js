@@ -2,6 +2,7 @@ import DatabaseService from './src/services/database.js';
 import * as UI from './src/ui/components.js';
 import Session from './src/models/Session.js';
 import { initServiceWorker } from './src/utils/serviceWorker.js';
+import { showNotification } from './src/ui/notifications.js';
 
 // ⭐ Configuration de la base de données IndexedDB
 // (Gérée maintenant dans db/db.js)
@@ -48,18 +49,16 @@ btnBatsu.addEventListener('click', () => {
 // Enregistrer la session 
 btnSave.addEventListener('click', async () => {
   try {
-    // Appel au service
     await DatabaseService.saveSession(currentSession.toData());
-    console.log('✅ Session enregistrée');
+    showNotification('Session enregistrée avec succès', 'success');  // ✅
 
-    // Réinitialiser la session
     currentSession.reset();
     UI.updateCounters(currentSession);
     await loadHistory();
 
   } catch (error) {
     console.error('❌ Erreur:', error);
-    alert('Erreur lors de l\'enregistrement');
+    showNotification('Erreur lors de l\'enregistrement', 'error');  // ✅
   }
 });
 
@@ -74,5 +73,5 @@ document.addEventListener('DOMContentLoaded', async () => {
   console.log('🚀 Chargement de l\'application...');
   UI.updateCounters(currentSession);
   await loadHistory();
-  console.log('✅ Application prête !');
+  showNotification('Application prête !', 'info');  // ✅
 });
