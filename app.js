@@ -16,10 +16,6 @@ initServiceWorker(BASE_PATH, (worker) => {
   UI.showUpdateNotification(worker);
 });
 
-// ========================================
-// Fonctions avec IndexedDB (V2)
-// ========================================
-
 // État de la session en cours
 let currentSession = new Session();
 
