@@ -2,11 +2,16 @@ import db from '../../db/db.js';
 
 const DatabaseService = {
 
+    // ⭐ Init de la DB
+    async init() {
+        await initDatabase();
+    },
+
     async saveSession(sessionData) {
         // sessionData = { makiwara: 5, kinteki: [{result: true}, {result: false}] }
 
         // ÉTAPE 1 : Créer la session
-        const sessionId = await db.session.add({
+        const sessionId = await db.sessions.add({
             date: new Date(),
             location: 'Dojo',
             type: 'entrainement',
@@ -38,7 +43,7 @@ const DatabaseService = {
     // Charger l'historique (V2)
     async loadHistory(limit = 10) {
         // Récupérer les sessions récentes
-        const sessions = await db.session.orderBy('date').reverse().limit(limit).toArray();
+        const sessions = await db.sessions.orderBy('date').reverse().limit(limit).toArray();
 
         if (sessions.length === 0) return [];
 
