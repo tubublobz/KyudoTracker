@@ -1,3 +1,4 @@
+import Dexie from 'dexie';
 import { seedDatabase } from './seed-data.js';
 
 const db = new Dexie('KyudoTrackerDB');
@@ -11,11 +12,15 @@ db.version(4).stores({
     shotTypes: '++id, code'
 });
 
-try {
-    await db.open();
-    await seedDatabase(db);
-} catch (error) {
-    console.error('❌ Database initialization failed:', error);
+// Fonction d'initialisation
+export async function initDatabase() {
+    try {
+        await db.open();
+        await seedDatabase(db);
+        console.log('✅ Database ready');
+    } catch (error) {
+        console.error('❌ Database initialization failed:', error);
+        throw error;
+    }
 }
-
 export default db;

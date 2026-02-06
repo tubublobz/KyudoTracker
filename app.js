@@ -3,6 +3,7 @@ import * as UI from './src/ui/components.js';
 import Session from './src/models/Session.js';
 import { initServiceWorker } from './src/utils/serviceWorker.js';
 import { showNotification } from './src/ui/notifications.js';
+import db, { initDatabase } from './db/db.js';  // ⭐ Ajoute { initDatabase }
 
 // ⭐ Configuration de la base de données IndexedDB
 // (Gérée maintenant dans db/db.js)
@@ -71,6 +72,7 @@ async function loadHistory() {
 // Initialisation
 document.addEventListener('DOMContentLoaded', async () => {
   console.log('🚀 Chargement de l\'application...');
+  await initDatabase();
   UI.updateCounters(currentSession);
   await loadHistory();
   showNotification('Application prête !', 'info');  // ✅
