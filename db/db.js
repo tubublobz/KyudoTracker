@@ -11,13 +11,11 @@ db.version(4).stores({
     shotTypes: '++id, code'
 });
 
-// Hook pour peupler la base de données si nécessaire
-db.on('ready', async () => {
-    try {
-        await seedDatabase(db);
-    } catch (error) {
-        console.error('❌ Erreur lors du seeding :', error);
-    }
-});
+try {
+    await db.open();
+    await seedDatabase(db);
+} catch (error) {
+    console.error('❌ Database initialization failed:', error);
+}
 
 export default db;
