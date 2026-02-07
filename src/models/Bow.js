@@ -58,3 +58,5 @@ class Bow {
     }
   }
 }
+
+export default Bow;
