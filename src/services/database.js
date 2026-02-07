@@ -7,6 +7,9 @@ const DatabaseService = {
         await initDatabase();
     },
 
+    // ==================== 1 - GESTION DES SESSIONS ====================
+
+
     async saveSession(sessionData) {
         // sessionData = { makiwara: 5, kinteki: [{result: true}, {result: false}] }
 
@@ -72,7 +75,59 @@ const DatabaseService = {
                 };
             })
         );
-    }
+    },
+
+    // ==================== 2 - GESTION DES ARCS ====================
+
+    async createBow(bowData) {
+        const bow = new Bow(bowData);
+        const { valid, errors } = bow.validate();
+
+        if (!valid) {
+            throw new Error(`Validation failed: ${errors.join(', ')}`);
+        }
+
+        const id = await db.bows.add(bow.toJSON());
+        return id;
+    },
+
+    async getAllBows() {
+        const bows = await db.bows.orderBy('createdAt').reverse().toArray();
+        return bows;
+    },
+
+    async getActiveBows() {
+        const bows = await db.bows
+            .where('status')
+            .anyOf(['new', 'active'])
+            .toArray();
+        return bows;
+    },
+
+    async getBowById(id) {
+        const bow = await db.bows.get(id);
+        return bow || null;
+    },
+
+    async updateBow(id, updates) {
+        const bow = new Bow({ id, ...updates });
+        const { valid, errors } = bow.validate();
+
+        if (!valid) {
+            throw new Error(`Validation failed: ${errors.join(', ')}`);
+        }
+
+        const count = await db.bows.update(id, bow.toJSON());
+        return count;
+    },
+
+    async setDefaultBow(id) {
+        // Retirer le défaut de tous les autres arcs
+        await db.bows.where('isDefault').equals(true).modify({ isDefault: false });
+
+        // Définir le nouvel arc par défaut
+        await db.bows.update(id, { isDefault: true });
+    },
 };
 
 export default DatabaseService;
