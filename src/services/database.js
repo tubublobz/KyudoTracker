@@ -1,4 +1,5 @@
 import db, { initDatabase } from '../../db/db.js';
+import Bow from '../models/Bow.js';
 
 const DatabaseService = {
 
