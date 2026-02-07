@@ -5,12 +5,12 @@ const btnSave = document.getElementById('btn-save');
 const historyList = document.getElementById('history');
 
 export function updateCounters(sessionData) {
-    countMakiwara.textContent = sessionData.makiwara;
-    countKinteki.textContent = sessionData.kinteki.length;
-    countHits.textContent = sessionData.kinteki.filter(t => t.result).length;
+    countMakiwara.textContent = sessionData.getMakiwaraCount();
+    countKinteki.textContent = sessionData.getKintekiCount();
+    countHits.textContent = sessionData.getHits();
 
     // Activer le bouton enregistrer s'il y a au moins un tir
-    btnSave.disabled = (sessionData.makiwara === 0 && sessionData.kinteki.length === 0);
+    btnSave.disabled = (sessionData.isEmpty());
 }
 
 export function displayHistory(sessions) {
@@ -24,7 +24,10 @@ export function displayHistory(sessions) {
     // Afficher chaque session
     for (const session of sessions) {
         const li = document.createElement("li");
-        let text = `${session.date.toLocaleString('fr-FR')}`;
+
+        // Convertir la date string en objet Date
+        const date = new Date(session.date);
+        let text = `${date.toLocaleString('fr-FR')}`;
 
         if (session.stats.makiwara > 0) {
             text += ` — Makiwara: ${session.stats.makiwara}`;
