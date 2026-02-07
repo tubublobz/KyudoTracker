@@ -1,4 +1,4 @@
-import db from '../../db/db.js';
+import db, { initDatabase } from '../../db/db.js';
 
 const DatabaseService = {
 
@@ -15,22 +15,24 @@ const DatabaseService = {
             date: new Date(),
             location: 'Dojo',
             type: 'entrainement',
-            bowId: sessionData.bowId || null
+            initialBowId: sessionData.initialBowId || null
         });
 
         // ÉTAPE 2 : Sauvegarder les tirs makiwara
-        if (sessionData.makiwara > 0) {
-            const makiTirs = Array(sessionData.makiwara).fill({
+        if (sessionData.makiwaraShots && sessionData.makiwaraShots.length > 0) {
+            const makiTirs = sessionData.makiwaraShots.map(shot => ({
                 sessionId: sessionId,
+                bowId: shot.bowId,  // ⭐ Ajouté
                 typeCode: 'maki'
-            });
+            }));
             await db.shots.bulkAdd(makiTirs);
         }
 
         // ÉTAPE 3 : Sauvegarder les tirs kinteki
-        if (sessionData.kinteki.length > 0) {
-            const kintekiTirs = sessionData.kinteki.map(t => ({
+        if (sessionData.kintekiShots && sessionData.kintekiShots.length > 0) {
+            const kintekiTirs = sessionData.kintekiShots.map(t => ({
                 sessionId: sessionId,
+                bowId: t.bowId,
                 typeCode: 'kinteki28',
                 result: t.result
             }));
@@ -61,6 +63,7 @@ const DatabaseService = {
                     date: s.date,
                     location: s.location,
                     type: s.type,
+                    initialBowId: s.initialBowId,
                     stats: {
                         makiwara: shots.filter(t => t.typeCode === 'maki').length,
                         kintekiTotal: kintekiShots.length,
