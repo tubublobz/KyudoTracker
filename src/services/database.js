@@ -93,7 +93,7 @@ const DatabaseService = {
     },
 
     async getAllBows() {
-        const bows = await db.bows.orderBy('createdAt').reverse().toArray();
+        const bows = await db.bows.orderBy('id').toArray();
         return bows;
     },
 
