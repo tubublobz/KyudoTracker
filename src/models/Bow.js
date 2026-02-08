@@ -1,6 +1,6 @@
 class Bow {
   constructor(data = {}) {
-    this.id = data.id || null;
+    this.id = data.id; // si undefined -> incrément
     this.name = data.name || '';
     this.strength = data.strength || null; // en kg
     this.notes = data.notes || '';
