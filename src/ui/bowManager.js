@@ -17,13 +17,13 @@ let editingBowId = null; // null = création, sinon = ID de l'arc en édition
 
 // ==================== NAVIGATION ====================
 
-export function showBowsScreen() {
+export async function showBowsScreen() {
     // Masquer app-container, afficher bows-screen
     document.getElementById('app-container').style.display = 'none';
     document.getElementById('bows-screen').style.display = 'block';
     
     // Charger et afficher la liste des arcs
-    renderBowsList();  
+    await renderBowsList();  
 }
 
 export function hideBowsScreen() {
@@ -108,10 +108,12 @@ async function setAsDefault(bowId) {
 // ==================== INITIALISATION ====================
 
 export function initBowManager() {
-    // TODO: Attacher tous les event listeners globaux
-    // - Bouton "+ Ajouter un arc"
-    // - Bouton "← Retour"
-    // - Soumission du formulaire
-    // - Bouton "Annuler" du formulaire
-    // - Color picker change
+    // Bouton "← Retour"
+    document.getElementById('back-from-bows-btn').addEventListener('click', hideBowsScreen);
+    
+    // Bouton "+ Ajouter un arc" 
+    document.getElementById('add-bow-btn').addEventListener('click', openBowForm);
+    
+    // Formulaire (on le fera après)
+    // TODO
 }
