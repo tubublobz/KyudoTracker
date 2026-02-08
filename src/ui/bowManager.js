@@ -96,12 +96,36 @@ async function loadBowData(bowId) {
 }
 
 function renderColorSuggestions(selectedColor = '#3498db') {
-    // TODO: Générer les 8 pastilles colorées
-    // TODO: Attacher les event listeners
+    const container = document.getElementById('bow-color-suggestions');
+    
+    // Générer les pastilles
+    container.innerHTML = SUGGESTED_COLORS.map(color => `
+        <div class="color-chip ${color === selectedColor ? 'selected' : ''}" 
+             data-color="${color}" 
+             style="background-color: ${color}">
+        </div>
+    `).join('');
+    
+    // Attacher les event listeners
+    container.querySelectorAll('.color-chip').forEach(chip => {
+        chip.addEventListener('click', (e) => {
+            const color = e.target.dataset.color;
+            selectColor(color);
+        });
+    });
 }
 
 function selectColor(color) {
-    // TODO: Mettre à jour le color picker + l'affichage hex
+    // Mettre à jour le color picker natif
+    document.getElementById('bow-color').value = color;
+    
+    // Mettre à jour l'affichage du code couleur
+    document.getElementById('bow-color-value').textContent = color;
+    
+    // Mettre à jour la sélection visuelle des pastilles
+    document.querySelectorAll('.color-chip').forEach(chip => {
+        chip.classList.toggle('selected', chip.dataset.color === color);
+    });
 }
 
 async function saveBow(formData) {
@@ -132,7 +156,8 @@ export function initBowManager() {
     
     // Bouton "+ Ajouter un arc" 
     document.getElementById('add-bow-btn').addEventListener('click', openBowForm);
-    
+    document.getElementById('cancel-bow-form').addEventListener('click', closeBowForm);
+
     // Formulaire (on le fera après)
     // TODO
 }
