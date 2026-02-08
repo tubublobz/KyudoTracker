@@ -70,8 +70,8 @@ export function openBowForm(bowId = null) {
 
     // Réinitialiser le formulaire
     form.reset();
-
-    if (bowId === null) {
+    console.log("bow Id = ", bowId);
+    if (bowId == null) {
         // Mode création
         title.textContent = 'Nouvel arc';
         renderColorSuggestions('#3498db');  // Couleur par défaut
@@ -96,8 +96,12 @@ async function loadBowData(bowId) {
 }
 
 function renderColorSuggestions(selectedColor = '#3498db') {
+    console.log('🔥 DEBUT renderColorSuggestions');  // ⭐
+    console.log('SUGGESTED_COLORS:', SUGGESTED_COLORS);  // ⭐
+    console.log('selectedColor:', selectedColor);  // ⭐
+    
     const container = document.getElementById('bow-color-suggestions');
-
+    console.log('container:', container);  // ⭐
     // Générer les pastilles
     container.innerHTML = SUGGESTED_COLORS.map(color => `
         <div class="color-chip ${color === selectedColor ? 'selected' : ''}" 
@@ -171,7 +175,7 @@ export function initBowManager() {
     document.getElementById('back-from-bows-btn').addEventListener('click', hideBowsScreen);
 
     // Bouton "+ Ajouter un arc" 
-    document.getElementById('add-bow-btn').addEventListener('click', openBowForm);
+    document.getElementById('add-bow-btn').addEventListener('click', () => openBowForm(null));
 
     // Formulaire
     document.getElementById('bow-form').addEventListener('submit', (e) => {

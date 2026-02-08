@@ -1,4 +1,4 @@
-const CACHE_NAME = "kyudo-cache-v1.0";
+const CACHE_NAME = "kyudo-cache-v1.1";
 
 // Installation simple
 self.addEventListener('install', (event) => {
