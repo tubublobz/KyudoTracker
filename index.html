@@ -12,7 +12,8 @@
 
 <body>
   <h1>Kyudo Tracker <span id="app-version" class="version">v0.7.1</span></h1>
-
+  <!-- ⭐ Bouton temporaire pour tester -->
+<button id="test-bows-btn" style="margin: 10px;">🏹 Mes arcs (TEST)</button>
   <div id="app-container">
     <!-- Section Makiwara -->
     <button id="btn-makiwara" class="control-group btn-card full-width">
@@ -45,6 +46,76 @@
     </section>
   </div>
 
+  <!-- Écran de gestion des arcs -->
+  <div id="bows-screen" style="display:none">
+    <header class="bows-header">
+      <h1>🏹 Mes arcs</h1>
+      <button id="add-bow-btn" class="btn-primary">+ Ajouter un arc</button>
+    </header>
+
+    <div id="bows-list" class="bows-list">
+      <!-- Les cartes d'arcs seront générées ici -->
+    </div>
+
+    <button id="back-from-bows-btn" class="btn-secondary">← Retour</button>
+  </div>
+
+  <!-- Formulaire arc (modal/overlay) -->
+  <div id="bow-form-overlay" class="overlay" style="display:none">
+    <div class="bow-form-container">
+      <h2 id="bow-form-title">Nouvel arc</h2>
+
+      <form id="bow-form">
+        <label>
+          Nom de l'arc *
+          <input type="text" id="bow-name" required>
+        </label>
+
+        <label>
+          Puissance (kg)
+          <input type="number" id="bow-strength" step="0.5" min="0">
+        </label>
+
+        <label>
+          Taille
+          <select id="bow-size">
+            <option value="">Non précisée</option>
+            <option value="namisun">Namisun (並寸)</option>
+            <option value="nisun">Nisun (二寸)</option>
+            <option value="yonsun">Yonsun (四寸)</option>
+            <option value="rokusun">Rokusun (六寸)</option>
+            <option value="autre">Autre</option>
+          </select>
+        </label>
+
+        <label class="checkbox-label">
+          <input type="checkbox" id="bow-bamboo">
+          Arc en bambou
+        </label>
+
+        <label>
+          Couleur
+          <div class="color-picker-wrapper">
+            <input type="color" id="bow-color" value="#3498db">
+            <span id="bow-color-value">#3498db</span>
+          </div>
+          <div class="color-suggestions" id="bow-color-suggestions">
+            <!-- Pastilles générées en JS -->
+          </div>
+        </label>
+
+        <label>
+          Notes
+          <textarea id="bow-notes" rows="3"></textarea>
+        </label>
+
+        <div class="form-actions">
+          <button type="submit" class="btn-primary">Enregistrer</button>
+          <button type="button" id="cancel-bow-form" class="btn-secondary">Annuler</button>
+        </div>
+      </form>
+    </div>
+  </div>
   <!-- Historique -->
   <section class="history-section">
     <h2>Historique</h2>
