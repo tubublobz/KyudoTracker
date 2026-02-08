@@ -62,13 +62,32 @@ function attachBowCardListeners() {
 // ==================== FORMULAIRE ====================
 
 export function openBowForm(bowId = null) {
-    // TODO: Ouvrir l'overlay
-    // TODO: Si bowId fourni, charger les données de l'arc
-    // TODO: Sinon, formulaire vide
+    editingBowId = bowId;  // Stocker l'ID (null = création)
+    
+    const overlay = document.getElementById('bow-form-overlay');
+    const title = document.getElementById('bow-form-title');
+    const form = document.getElementById('bow-form');
+    
+    // Réinitialiser le formulaire
+    form.reset();
+    
+    if (bowId === null) {
+        // Mode création
+        title.textContent = 'Nouvel arc';
+        renderColorSuggestions('#3498db');  // Couleur par défaut
+    } else {
+        // Mode édition
+        title.textContent = 'Modifier l\'arc';
+        loadBowData(bowId);  // On codera ça juste après
+    }
+    
+    // Afficher l'overlay
+    overlay.style.display = 'flex';
 }
 
 export function closeBowForm() {
-    // TODO: Fermer l'overlay, reset le formulaire
+    document.getElementById('bow-form-overlay').style.display = 'none';
+    editingBowId = null;
 }
 
 async function loadBowData(bowId) {
