@@ -21,9 +21,9 @@ export async function showBowsScreen() {
     // Masquer app-container, afficher bows-screen
     document.getElementById('app-container').style.display = 'none';
     document.getElementById('bows-screen').style.display = 'block';
-    
+
     // Charger et afficher la liste des arcs
-    await renderBowsList();  
+    await renderBowsList();
 }
 
 export function hideBowsScreen() {
@@ -37,16 +37,16 @@ export function hideBowsScreen() {
 async function renderBowsList() {
     const bows = await DatabaseService.getAllBows();
     const bowsListElement = document.getElementById('bows-list');
-    
+
     // Cas 1 : Aucun arc
     if (bows.length === 0) {
         bowsListElement.innerHTML = '<p class="empty-state">Aucun arc enregistré. Commencez par en ajouter un !</p>';
         return;
     }
-    
+
     // Cas 2 : Afficher les arcs
     bowsListElement.innerHTML = bows.map(bow => createBowCard(bow)).join('');
-    
+
     // Attacher les event listeners
     attachBowCardListeners();
 }
@@ -63,14 +63,14 @@ function attachBowCardListeners() {
 
 export function openBowForm(bowId = null) {
     editingBowId = bowId;  // Stocker l'ID (null = création)
-    
+
     const overlay = document.getElementById('bow-form-overlay');
     const title = document.getElementById('bow-form-title');
     const form = document.getElementById('bow-form');
-    
+
     // Réinitialiser le formulaire
     form.reset();
-    
+
     if (bowId === null) {
         // Mode création
         title.textContent = 'Nouvel arc';
@@ -80,7 +80,7 @@ export function openBowForm(bowId = null) {
         title.textContent = 'Modifier l\'arc';
         loadBowData(bowId);  // On codera ça juste après
     }
-    
+
     // Afficher l'overlay
     overlay.style.display = 'flex';
 }
@@ -97,7 +97,7 @@ async function loadBowData(bowId) {
 
 function renderColorSuggestions(selectedColor = '#3498db') {
     const container = document.getElementById('bow-color-suggestions');
-    
+
     // Générer les pastilles
     container.innerHTML = SUGGESTED_COLORS.map(color => `
         <div class="color-chip ${color === selectedColor ? 'selected' : ''}" 
@@ -105,7 +105,7 @@ function renderColorSuggestions(selectedColor = '#3498db') {
              style="background-color: ${color}">
         </div>
     `).join('');
-    
+
     // Attacher les event listeners
     container.querySelectorAll('.color-chip').forEach(chip => {
         chip.addEventListener('click', (e) => {
@@ -118,20 +118,35 @@ function renderColorSuggestions(selectedColor = '#3498db') {
 function selectColor(color) {
     // Mettre à jour le color picker natif
     document.getElementById('bow-color').value = color;
-    
+
     // Mettre à jour l'affichage du code couleur
     document.getElementById('bow-color-value').textContent = color;
-    
+
     // Mettre à jour la sélection visuelle des pastilles
     document.querySelectorAll('.color-chip').forEach(chip => {
         chip.classList.toggle('selected', chip.dataset.color === color);
     });
 }
 
+
 async function saveBow(formData) {
-    // TODO: Créer ou modifier l'arc
-    // TODO: Gérer les erreurs
-    // TODO: Fermer le formulaire et rafraîchir la liste
+    try {
+        // Créer l'arc via le service (qui valide automatiquement)
+        await DatabaseService.createBow(formData);
+
+        // Afficher notification succès
+        showNotification(`Arc "${formData.name}" créé avec succès`, 'success');
+
+        //  Fermer le formulaire
+        closeBowForm();
+
+        // Rafraîchir la liste
+        renderBowsList();
+
+    } catch (error) {
+        console.error('Erreur sauvegarde arc:', error);
+        // TODO: Afficher notification erreur
+    }
 }
 
 // ==================== ACTIONS ====================
@@ -150,14 +165,29 @@ async function setAsDefault(bowId) {
 
 // ==================== INITIALISATION ====================
 
+
 export function initBowManager() {
     // Bouton "← Retour"
     document.getElementById('back-from-bows-btn').addEventListener('click', hideBowsScreen);
-    
+
     // Bouton "+ Ajouter un arc" 
     document.getElementById('add-bow-btn').addEventListener('click', openBowForm);
+
+    // Formulaire
+    document.getElementById('bow-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        // Créer l'objet formData
+        const formData = {
+            name: document.getElementById('bow-name').value,
+            strength: document.getElementById('bow-strength').value || null,
+            size: document.getElementById('bow-size').value || null,
+            isBamboo: document.getElementById('bow-bamboo').checked,
+            color: document.getElementById('bow-color').value,
+            notes: document.getElementById('bow-notes').value
+        };
+        saveBow(formData);
+    });
+
     document.getElementById('cancel-bow-form').addEventListener('click', closeBowForm);
 
-    // Formulaire (on le fera après)
-    // TODO
 }
