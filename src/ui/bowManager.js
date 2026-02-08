@@ -35,7 +35,7 @@ export function hideBowsScreen() {
 // ==================== LISTE DES ARCS ====================
 
 async function renderBowsList() {
-    const bows = await DatabaseService.getAllBows();
+    const bows = await DatabaseService.getActiveBows();
     const bowsListElement = document.getElementById('bows-list');
 
     // Cas 1 : Aucun arc
@@ -72,29 +72,85 @@ function createBowCard(bow) {
                     ${bow.status === 'active' ? '✅ Actif' : ''}
                     ${bow.status === 'inactive' ? '💤 Inactif' : ''}
                     ${bow.status === 'deleted' ? '🗑️ Supprimé' : ''}
-                </span>            </div>
+                </span>
+            </div>
             
             <div class="bow-actions">
-                <button class="btn-edit" data-bow-id="${bow.id}">✏️ Éditer</button>
-
-                ${bow.status === 'new' 
-                    ? `<button class="btn-delete" data-bow-id="${bow.id}">🗑️ Supprimer</button>`
-                    : `<button class="btn-archive" data-bow-id="${bow.id}">
-                        ${bow.status === 'active' ? '💤 Archiver' : '✅ Réactiver'}
-                    </button>`
-                }
-
-                ${!bow.isDefault && bow.status !== 'inactive' 
-                    ? `<button class="btn-default" data-bow-id="${bow.id}">⭐ Définir par défaut</button>`
-                    : ''
-                }            
+                <button class="kebab-menu-btn" data-bow-id="${bow.id}">
+                    <span class="kebab-dot"></span>
+                    <span class="kebab-dot"></span>
+                    <span class="kebab-dot"></span>
+                </button>
+                
+                <!-- Menu déroulant (caché par défaut) -->
+                <div class="kebab-menu hidden" data-bow-id="${bow.id}">
+                    <button class="menu-item btn-edit" data-bow-id="${bow.id}">✏️ Éditer</button>
+                    <button class="menu-item btn-delete" data-bow-id="${bow.id}">🗑️ Supprimer</button>
+                    ${!bow.isDefault && bow.status !== 'inactive'
+            ? `<button class="menu-item btn-default" data-bow-id="${bow.id}">⭐ Définir par défaut</button>`
+            : ''
+        }
+                </div>
             </div>
         </div>
     `;
 }
 
 function attachBowCardListeners() {
-    // TODO: Attacher les listeners sur les boutons des cartes
+
+    // Boutons kebab menu
+    document.querySelectorAll('.kebab-menu-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation(); // Empêche la fermeture immédiate
+            const bowId = parseInt(btn.dataset.bowId);
+            toggleKebabMenu(bowId);
+        });
+    });
+    // Boutons "Éditer"
+    document.querySelectorAll('.btn-edit').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const bowId = parseInt(btn.dataset.bowId);
+            openBowForm(bowId);
+        });
+    });
+    // Boutons "Supprimer"
+    document.querySelectorAll('.btn-delete').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const bowId = parseInt(btn.dataset.bowId);
+            deleteBow(bowId);
+        });
+    });
+    // Boutons "Définir par défaut"
+    document.querySelectorAll('.btn-default').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const bowId = parseInt(btn.dataset.bowId);
+            setAsDefault(bowId);
+        });
+    });
+
+    // Fermer les menus si on clique ailleurs
+    document.addEventListener('click', () => {
+        document.querySelectorAll('.kebab-menu').forEach(menu => {
+            menu.classList.add('hidden');
+        });
+    });
+}
+
+function toggleKebabMenu(bowId) {
+    const menu = document.querySelector(`.kebab-menu[data-bow-id="${bowId}"]`);
+    
+    // Si ce menu est déjà ouvert, le fermer
+    if (!menu.classList.contains('hidden')) {
+        menu.classList.add('hidden');
+        return;
+    }
+    
+    // Sinon, fermer tous les autres et ouvrir celui-ci
+    document.querySelectorAll('.kebab-menu').forEach(m => {
+        m.classList.add('hidden');
+    });
+    
+    menu.classList.remove('hidden');
 }
 
 // ==================== FORMULAIRE ====================
@@ -129,17 +185,30 @@ export function closeBowForm() {
 }
 
 async function loadBowData(bowId) {
-    // TODO: Charger un arc depuis la DB
-    // TODO: Remplir les champs du formulaire
+    // 1. Charger l'arc depuis la DB
+    const bow = await DatabaseService.getBowById(bowId);
+
+    if (!bow) {
+        showNotification('Arc introuvable', 'error');
+        closeBowForm();
+        return;
+    }
+
+    // 2. Remplir les champs du formulaire
+    document.getElementById('bow-name').value = bow.name;
+    document.getElementById('bow-strength').value = bow.strength || '';
+    document.getElementById('bow-size').value = bow.size || '';
+    document.getElementById('bow-bamboo').checked = bow.isBamboo || false;
+    document.getElementById('bow-color').value = bow.color;
+    document.getElementById('bow-notes').value = bow.notes || '';
+
+    // 3. Mettre à jour l'affichage de la couleur
+    document.getElementById('bow-color-value').textContent = bow.color;
+    renderColorSuggestions(bow.color);
 }
 
 function renderColorSuggestions(selectedColor = '#3498db') {
-    console.log('🔥 DEBUT renderColorSuggestions');  // ⭐
-    console.log('SUGGESTED_COLORS:', SUGGESTED_COLORS);  // ⭐
-    console.log('selectedColor:', selectedColor);  // ⭐
-
     const container = document.getElementById('bow-color-suggestions');
-    console.log('container:', container);  // ⭐
     // Générer les pastilles
     container.innerHTML = SUGGESTED_COLORS.map(color => `
         <div class="color-chip ${color === selectedColor ? 'selected' : ''}" 
@@ -173,28 +242,50 @@ function selectColor(color) {
 
 async function saveBow(formData) {
     try {
+        if (editingBowId == null) {
+            await DatabaseService.createBow(formData);
+            showNotification(`Arc "${formData.name}" créé avec succès`, 'success');
+        }
         // Créer l'arc via le service (qui valide automatiquement)
-        await DatabaseService.createBow(formData);
+        else {
+            await DatabaseService.updateBow(editingBowId, formData);
+            showNotification(`Arc "${formData.name}" mis à jour avec succès`, 'success');
+        }
 
-        // Afficher notification succès
-        showNotification(`Arc "${formData.name}" créé avec succès`, 'success');
-
-        //  Fermer le formulaire
+        //  Fermer le formulaire et refraîchir la list
         closeBowForm();
-
-        // Rafraîchir la liste
         renderBowsList();
 
     } catch (error) {
         console.error('Erreur sauvegarde arc:', error);
-        // TODO: Afficher notification erreur
+        showNotification(`Erreur lors de la sauvegarde de l'arc`, 'error');
     }
 }
 
 // ==================== ACTIONS ====================
 
 async function deleteBow(bowId) {
-    // TODO: Confirmation + suppression (status = 'deleted')
+    // 1. Charger l'arc pour afficher son nom
+    const bow = await DatabaseService.getBowById(bowId);
+
+    if (!bow) {
+        showNotification('Arc introuvable', 'error');
+        return;
+    }
+
+    // 2. Demander confirmation
+    const confirmed = confirm(`Supprimer l'arc "${bow.name}" ?\n\nCette action est définitive.`);
+
+    if (!confirmed) {
+        return; // L'utilisateur a annulé
+    }
+
+    // 3. Supprimer l'arc (changer son status à 'deleted')
+    await DatabaseService.updateBow(bowId, { status: 'deleted' });
+
+    // 4. Notification + rafraîchir la liste
+    showNotification(`Arc "${bow.name}" supprimé`, 'success');
+    await renderBowsList();
 }
 
 async function toggleBowStatus(bowId) {
@@ -202,7 +293,20 @@ async function toggleBowStatus(bowId) {
 }
 
 async function setAsDefault(bowId) {
-    // TODO: Appeler DatabaseService.setDefaultBow()
+    try {
+        // 1. Appeler le service (qui gère tout)
+        await DatabaseService.setDefaultBow(bowId);
+
+        // 2. Notification
+        showNotification('Arc défini par défaut', 'success');
+
+        // 3. Rafraîchir la liste
+        await renderBowsList();
+
+    } catch (error) {
+        console.error('Erreur setAsDefault:', error);
+        showNotification('Erreur lors de la mise à jour', 'error');
+    }
 }
 
 // ==================== INITIALISATION ====================

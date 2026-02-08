@@ -111,24 +111,40 @@ const DatabaseService = {
     },
 
     async updateBow(id, updates) {
-        const bow = new Bow({ id, ...updates });
-        const { valid, errors } = bow.validate();
+        // 1. Charger l'arc existant
+        const existingBow = await db.bows.get(id);
+        if (!existingBow) {
+            throw new Error('Arc introuvable');
+        }
 
+        // 2. Fusionner avec les updates (la magie ✨)
+        const bow = new Bow({ ...existingBow, ...updates });
+
+        // 3. Valider
+        const { valid, errors } = bow.validate();
         if (!valid) {
             throw new Error(`Validation failed: ${errors.join(', ')}`);
         }
 
+        // 4. Sauvegarder
         const count = await db.bows.update(id, bow.toJSON());
         return count;
     },
 
     async setDefaultBow(id) {
-        // Retirer le défaut de tous les autres arcs
-        await db.bows.where('isDefault').equals(true).modify({ isDefault: false });
+        // 1. Récupérer TOUS les arcs
+        const allBows = await db.bows.toArray();
 
-        // Définir le nouvel arc par défaut
+        // 2. Retirer isDefault de tous les arcs qui l'ont
+        for (const bow of allBows) {
+            if (bow.isDefault === true) {
+                await db.bows.update(bow.id, { isDefault: false });
+            }
+        }
+
+        // 3. Définir le nouvel arc par défaut
         await db.bows.update(id, { isDefault: true });
-    },
+    }
 };
 
 export default DatabaseService;

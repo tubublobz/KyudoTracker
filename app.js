@@ -47,8 +47,8 @@ btnBatsu.addEventListener('click', () => {
   UI.updateCounters(currentSession);
 });
 
-// ⭐ Bouton temporaire pour tester la navigation
-document.getElementById('test-bows-btn').addEventListener('click', () => {
+// Navigation vers "Mes arcs"
+document.getElementById('nav-bows-btn').addEventListener('click', () => {
   showBowsScreen();
 });
 // Enregistrer la session 

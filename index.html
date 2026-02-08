@@ -11,9 +11,10 @@
 </head>
 
 <body>
-  <h1>Kyudo Tracker <span id="app-version" class="version">v0.7.1</span></h1>
-  <!-- ⭐ Bouton temporaire pour tester -->
-<button id="test-bows-btn" style="margin: 10px;">🏹 Mes arcs (TEST)</button>
+  <header class="app-header">
+    <h1>Kyudo Tracker <span id="app-version" class="version">v0.7.1</span></h1>
+    <button id="nav-bows-btn" class="btn-icon-nav" title="Mes arcs">🏹</button>
+  </header>
   <div id="app-container">
     <!-- Section Makiwara -->
     <button id="btn-makiwara" class="control-group btn-card full-width">
@@ -50,8 +51,11 @@
   <div id="bows-screen" style="display:none">
     <header class="bows-header">
       <h1>🏹 Mes arcs</h1>
-      <button id="add-bow-btn" class="btn-primary">+ Ajouter un arc</button>
     </header>
+  
+    <button id="add-bow-btn" class="btn-primary btn-add-bow">
+      + Nouvel arc
+    </button>
 
     <div id="bows-list" class="bows-list">
       <!-- Les cartes d'arcs seront générées ici -->
