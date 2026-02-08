@@ -2,8 +2,8 @@ import { seedDatabase } from './seed-data.js';
 
 const db = new Dexie('KyudoTrackerDB');
 
-// Définition du schéma V5
-db.version(5).stores({
+// Définition du schéma V6
+db.version(6).stores({
     sessions: '++id, date, location, type, initialBowId',
     shots: '++id, sessionId, shareiId, bowId, typeCode, result',
     sharei: '++id, sessionId',
