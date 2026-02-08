@@ -52,7 +52,45 @@ async function renderBowsList() {
 }
 
 function createBowCard(bow) {
-    // TODO: Retourner le HTML d'une carte d'arc
+    return `
+        <div class="bow-card">
+            <div class="bow-color-indicator" style="background-color: ${bow.color}"></div>
+            
+            <div class="bow-info">
+                <h3>
+                    ${bow.name}     
+                    ${bow.isDefault ? '<span class="default-badge">⭐ Par défaut</span>' : ''}
+                </h3>
+                <p class="bow-meta">
+                    ${bow.strength ? `${bow.strength} kg` : 'Puissance non précisée'}
+                    ${bow.size ? ` • ${bow.size}` : ''}
+                    ${bow.isBamboo ? ' • 🎋 Bambou' : ''}
+                </p>
+                ${bow.notes ? `<p class="bow-notes">${bow.notes}</p>` : ''}
+                <span class="bow-status">
+                    ${bow.status === 'new' ? '🆕 Nouveau' : ''}
+                    ${bow.status === 'active' ? '✅ Actif' : ''}
+                    ${bow.status === 'inactive' ? '💤 Inactif' : ''}
+                    ${bow.status === 'deleted' ? '🗑️ Supprimé' : ''}
+                </span>            </div>
+            
+            <div class="bow-actions">
+                <button class="btn-edit" data-bow-id="${bow.id}">✏️ Éditer</button>
+
+                ${bow.status === 'new' 
+                    ? `<button class="btn-delete" data-bow-id="${bow.id}">🗑️ Supprimer</button>`
+                    : `<button class="btn-archive" data-bow-id="${bow.id}">
+                        ${bow.status === 'active' ? '💤 Archiver' : '✅ Réactiver'}
+                    </button>`
+                }
+
+                ${!bow.isDefault && bow.status !== 'inactive' 
+                    ? `<button class="btn-default" data-bow-id="${bow.id}">⭐ Définir par défaut</button>`
+                    : ''
+                }            
+            </div>
+        </div>
+    `;
 }
 
 function attachBowCardListeners() {
@@ -99,7 +137,7 @@ function renderColorSuggestions(selectedColor = '#3498db') {
     console.log('🔥 DEBUT renderColorSuggestions');  // ⭐
     console.log('SUGGESTED_COLORS:', SUGGESTED_COLORS);  // ⭐
     console.log('selectedColor:', selectedColor);  // ⭐
-    
+
     const container = document.getElementById('bow-color-suggestions');
     console.log('container:', container);  // ⭐
     // Générer les pastilles
