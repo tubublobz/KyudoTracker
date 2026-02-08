@@ -8,9 +8,6 @@ const SUGGESTED_COLORS = [
     '#2ecc71', // Vert
     '#f39c12', // Orange
     '#9b59b6', // Violet
-    '#1abc9c', // Turquoise
-    '#34495e', // Gris foncé
-    '#e67e22', // Orange foncé
 ];
 
 let editingBowId = null; // null = création, sinon = ID de l'arc en édition
@@ -220,6 +217,9 @@ function renderColorSuggestions(selectedColor = '#3498db') {
     // Attacher les event listeners
     container.querySelectorAll('.color-chip').forEach(chip => {
         chip.addEventListener('click', (e) => {
+            e.preventDefault(); // Empêche l'action par défaut
+            e.stopPropagation(); // Empêche la propagation
+
             const color = e.target.dataset.color;
             selectColor(color);
         });
@@ -333,7 +333,19 @@ export function initBowManager() {
         };
         saveBow(formData);
     });
+    
+    // Color picker natif - déselectionner les pastilles si on choisit une couleur custom
+    document.getElementById('bow-color').addEventListener('input', (e) => {
+        const customColor = e.target.value;
 
+        // Mettre à jour l'affichage
+        document.getElementById('bow-color-value').textContent = customColor;
+
+        // Déselectionner toutes les pastilles
+        document.querySelectorAll('.color-chip').forEach(chip => {
+            chip.classList.remove('selected');
+        });
+    });
     document.getElementById('cancel-bow-form').addEventListener('click', closeBowForm);
 
 }

@@ -80,5 +80,4 @@ document.addEventListener('DOMContentLoaded', async () => {
   initBowManager(); 
   UI.updateCounters(currentSession);
   await loadHistory();
-  showNotification('Application prête !', 'info');  // ✅
 });

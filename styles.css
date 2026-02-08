@@ -10,6 +10,9 @@ body {
   background-color: #f5f5f5;
   color: #333;
   text-align: center;
+  max-width: 600px; 
+  margin: 0 auto;       
+  padding: 20px;
 }
 
 h1 {
@@ -25,11 +28,9 @@ h2 {
 
 /* Layout */
 #app-container {
-  max-width: 600px;
-  margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 25px;
 }
 
 .control-group {
@@ -176,8 +177,22 @@ h2 {
 
 #history li {
   background: white;
-  padding: 10px 15px;
-  border-bottom: 1px solid #eee;
+  padding: 12px 15px;
+  margin-bottom: 10px;        /* ← Espace entre les sessions */
+  border-radius: 8px;         /* ← Coins arrondis */
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);  /* ← Léger relief */
+  text-align: left;
+  border: none;               /* ← Supprime les bordures */
+  font-size: 14px;
+}
+
+#history li:first-child {
+  border-radius: 8px;         /* ← Garde les coins arrondis */
+}
+
+#history li:last-child {
+  border-radius: 8px;
+  margin-bottom: 0;           /* ← Pas de marge en bas du dernier */
 }
 
 #history li:first-child {
@@ -299,14 +314,16 @@ h2 {
 
 #toast-container {
   position: fixed;
-  top: 20px;
-  right: 20px;
+  top: 20px;           /* En dessous du header */
+  left: 50%;           /* Centré horizontalement */
+  transform: translateX(-50%);  /* Vraiment centré */
   z-index: 9999;
   display: flex;
   flex-direction: column;
   gap: 10px;
+  width: 90%;
+  max-width: 300px;    /* Pas trop large */
 }
-
 .toast {
   padding: 16px 20px;
   border-radius: 8px;
@@ -528,6 +545,11 @@ h2 {
   margin-bottom: 15px;
   font-weight: 500;
 }
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
 
 #bow-form input,
 #bow-form select,
@@ -583,9 +605,9 @@ h2 {
 
 .color-suggestions {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-  margin-top: 10px;
+  grid-template-columns: repeat(5, 1fr); 
+  gap: 8px; 
+  margin-top: 8px; 
 }
 
 .color-chip {
@@ -616,23 +638,18 @@ h2 {
 
 .form-actions button {
   flex: 1;
-  padding: 10px;
-  font-size: 14px;
+  padding: 12px;  /* ← Même padding pour tous */
+  font-size: 16px; /* ← Même taille de texte */
   border: none;
   border-radius: 6px;
   cursor: pointer;
+  font-weight: 500; /* ← Même épaisseur */
 }
 
 /* Boutons génériques */
 .btn-secondary {
   background: #95a5a6;
   color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  margin-top: 10px;
 }
 
 .btn-secondary:hover {

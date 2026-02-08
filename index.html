@@ -12,7 +12,7 @@
 
 <body>
   <header class="app-header">
-    <h1>Kyudo Tracker <span id="app-version" class="version">v0.7.1</span></h1>
+    <h1>Kyudo Tracker <span id="app-version" class="version">v0.8.0</span></h1>
     <button id="nav-bows-btn" class="btn-icon-nav" title="Mes arcs">🏹</button>
   </header>
   <div id="app-container">
@@ -75,27 +75,32 @@
           <input type="text" id="bow-name" required>
         </label>
 
-        <label>
-          Puissance (kg)
-          <input type="number" id="bow-strength" step="0.5" min="0">
-        </label>
+    <div class="form-row">
+      <label>
+        Puissance (kg)
+        <input type="number" id="bow-strength" step="0.5" min="0">
+      </label>
 
-        <label>
-          Taille
-          <select id="bow-size">
-            <option value="">Non précisée</option>
-            <option value="namisun">Namisun (並寸)</option>
-            <option value="nisun">Nisun (二寸)</option>
-            <option value="yonsun">Yonsun (四寸)</option>
-            <option value="rokusun">Rokusun (六寸)</option>
-            <option value="autre">Autre</option>
-          </select>
-        </label>
+      <label>
+        Taille
+        <select id="bow-size">
+          <option value="">Non précisée</option>
+          <option value="namisun">Namisun (並寸)</option>
+          <option value="nisun">Nisun (二寸)</option>
+          <option value="yonsun">Yonsun (四寸)</option>
+          <option value="rokusun">Rokusun (六寸)</option>
+          <option value="autre">Autre</option>
+        </select>
+      </label>
+    </div>
 
+        <!-- Bambou masqué - Voir BACKLOG.md -->
+        <!--
         <label class="checkbox-label">
           <input type="checkbox" id="bow-bamboo">
           Arc en bambou
         </label>
+        -->
 
         <label>
           Couleur
