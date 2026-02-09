@@ -327,7 +327,7 @@ export function initBowManager() {
             name: document.getElementById('bow-name').value,
             strength: document.getElementById('bow-strength').value || null,
             size: document.getElementById('bow-size').value || null,
-            isBamboo: document.getElementById('bow-bamboo').checked,
+            // isBamboo: document.getElementById('bow-bamboo').checked,
             color: document.getElementById('bow-color').value,
             notes: document.getElementById('bow-notes').value
         };
