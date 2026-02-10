@@ -26,26 +26,37 @@ export async function showBowsScreen() {
 export function hideBowsScreen() {
     // Masquer bows-screen, afficher app-container
     document.getElementById('bows-screen').style.display = 'none';
-    document.getElementById('app-container').style.display = 'block';
+    document.getElementById('app-container').style.display = 'flex';
 }
 
 // ==================== LISTE DES ARCS ====================
 
-// Charger les arcs dans le sélecteur
-export async function loadBowSelector() {
-  const bowSelect = document.getElementById('bow-select');
-  const bows = await DatabaseService.getActiveBows();
-  
-  // Vider les options existantes (sauf la première)
-  bowSelect.innerHTML = '<option value="">Aucun arc sélectionné</option>';
-  
-  // Ajouter chaque arc
-  bows.forEach(bow => {
-    const option = document.createElement('option');
-    option.value = bow.id;
-    option.textContent = bow.name;
-    bowSelect.appendChild(option);
-  });
+// Charger les arcs dans le sélecteur et initialiser avec l'arc par défaut
+export async function initBowSelector(session) {
+    const bowSelect = document.getElementById('bow-select');
+    const bows = await DatabaseService.getActiveBows();
+    
+    // 1. Charger les arcs
+    bowSelect.innerHTML = '<option value="">Aucun arc sélectionné</option>';
+    
+    bows.forEach(bow => {
+        const option = document.createElement('option');
+        option.value = bow.id;
+        option.textContent = bow.name;
+        
+        if (bow.isDefault) {
+            option.selected = true;
+            session.setBow(bow.id);
+        }
+        
+        bowSelect.appendChild(option);
+    });
+    
+    // 2. Écouter les changements
+    bowSelect.addEventListener('change', (e) => {
+        const bowId = e.target.value ? parseInt(e.target.value) : null;
+        session.setBow(bowId);
+    });
 }
 
 
@@ -213,7 +224,7 @@ async function loadBowData(bowId) {
     document.getElementById('bow-name').value = bow.name;
     document.getElementById('bow-strength').value = bow.strength || '';
     document.getElementById('bow-size').value = bow.size || '';
-    document.getElementById('bow-bamboo').checked = bow.isBamboo || false;
+    //document.getElementById('bow-bamboo').checked = bow.isBamboo || false;
     document.getElementById('bow-color').value = bow.color;
     document.getElementById('bow-notes').value = bow.notes || '';
 
