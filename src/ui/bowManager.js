@@ -31,6 +31,24 @@ export function hideBowsScreen() {
 
 // ==================== LISTE DES ARCS ====================
 
+// Charger les arcs dans le sélecteur
+export async function loadBowSelector() {
+  const bowSelect = document.getElementById('bow-select');
+  const bows = await DatabaseService.getActiveBows();
+  
+  // Vider les options existantes (sauf la première)
+  bowSelect.innerHTML = '<option value="">Aucun arc sélectionné</option>';
+  
+  // Ajouter chaque arc
+  bows.forEach(bow => {
+    const option = document.createElement('option');
+    option.value = bow.id;
+    option.textContent = bow.name;
+    bowSelect.appendChild(option);
+  });
+}
+
+
 async function renderBowsList() {
     const bows = await DatabaseService.getActiveBows();
     const bowsListElement = document.getElementById('bows-list');

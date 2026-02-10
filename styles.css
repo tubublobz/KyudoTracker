@@ -780,3 +780,14 @@ h2 {
   background-color: #e0e0e0;
   transform: scale(0.95);
 }
+
+.bow-selector {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  text-align: center;  /* ← Centre le texte */
+  background-color: white;
+  cursor: pointer;
+}
