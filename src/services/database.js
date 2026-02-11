@@ -46,9 +46,8 @@ const DatabaseService = {
         return sessionId;
     },
 
-    // Charger l'historique (V2)
+    // Charger l'historique (V3 avec les arcs utilisés)
     async loadHistory(limit = 10) {
-        // Récupérer les sessions récentes
         const sessions = await db.sessions.orderBy('date').reverse().limit(limit).toArray();
 
         if (sessions.length === 0) return [];
@@ -58,20 +57,34 @@ const DatabaseService = {
                 // Récupérer les tirs
                 const shots = await db.shots.where('sessionId').equals(s.id).toArray();
 
-                // Filtrer les kinteki
+                // Filtrer par type de tir
+                const makiwaraShots = shots.filter(t => t.typeCode === 'maki');
                 const kintekiShots = shots.filter(t => t.typeCode === 'kinteki28');
+                const kintekiHits = kintekiShots.filter(t => t.result === true)
 
-                // Retourner l'objet avec stats
+                // Récupérer le nom de l'arc initial
+                let bowName = null;
+                if (s.initialBowId) {
+                    const bow = await db.bows.get(s.initialBowId);
+                    bowName = bow ? bow.name : null;
+                    console.log(bowName);
+                }
+
+                // Compter les arcs différents utilisés (autres que l'initial)
+                const uniqueBowIds = [...new Set(shots.map(shot => shot.bowId))];
+                const otherBowsCount = uniqueBowIds.filter(id => id !== s.initialBowId && id !== null).length;
                 return {
                     id: s.id,
                     date: s.date,
                     location: s.location,
                     type: s.type,
                     initialBowId: s.initialBowId,
+                    bowName: bowName,
+                    otherBowsCount: otherBowsCount,
                     stats: {
-                        makiwara: shots.filter(t => t.typeCode === 'maki').length,
+                        makiwara: makiwaraShots.length,
                         kintekiTotal: kintekiShots.length,
-                        kintekiHits: kintekiShots.filter(t => t.result === true).length
+                        kintekiHits: kintekiHits.length
                     }
                 };
             })

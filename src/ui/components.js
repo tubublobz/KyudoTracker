@@ -25,19 +25,30 @@ export function displayHistory(sessions) {
     for (const session of sessions) {
         const li = document.createElement("li");
 
-        // Convertir la date string en objet Date
+        // Convertir la date
         const date = new Date(session.date);
         let text = `${date.toLocaleString('fr-FR')}`;
 
+        // Afficher l'arc si présent
+        if (session.bowName) {
+            text += ` — 🏹 ${session.bowName}`;
+            
+            // Ajouter "(+ X autres arcs)" si plusieurs arcs utilisés
+            if (session.otherBowsCount > 0) {
+                text += ` (+ ${session.otherBowsCount} autre${session.otherBowsCount > 1 ? 's' : ''} arc${session.otherBowsCount > 1 ? 's' : ''})`;
+            }
+        }
+        text += '<br>';  // Saut de ligne avant les stats.
+        // Stats
         if (session.stats.makiwara > 0) {
-            text += ` — Makiwara: ${session.stats.makiwara}`;
+            text += `Makiwara: ${session.stats.makiwara}`;
         }
 
         if (session.stats.kintekiTotal > 0) {
             text += ` — Kinteki: ${session.stats.kintekiHits}/${session.stats.kintekiTotal}`;
         }
 
-        li.textContent = text;
+        li.innerHTML = text;
         historyList.appendChild(li);
     }
 }

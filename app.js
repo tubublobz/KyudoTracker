@@ -81,4 +81,5 @@ document.addEventListener('DOMContentLoaded', async () => {
   await initBowSelector(currentSession);
   UI.updateCounters(currentSession);
   await loadHistory();
+  console.log(currentSession);
 });

@@ -46,7 +46,8 @@ export async function initBowSelector(session) {
         
         if (bow.isDefault) {
             option.selected = true;
-            session.setBow(bow.id);
+            session.initialBowId = bow.id;   
+            session.currentBowId = bow.id;    
         }
         
         bowSelect.appendChild(option);
