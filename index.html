@@ -25,33 +25,46 @@
       </select>
     </section>
     <!-- Section Makiwara -->
-    <button id="btn-makiwara" class="control-group btn-card full-width">
+    <section class="control-group">
       <h2>Makiwara</h2>
-      <div class="icon-container">
-        <img src="icons/makiwara.png" alt="Makiwara">
-        <span id="count-makiwara" class="badge">0</span>
+      <div class="stepper">
+        <span class="stepper-label">🎯 Tirs</span>
+        <button id="btn-makiwara-minus" class="stepper-btn minus">−</button>
+        <span id="count-makiwara" class="stepper-count">0</span>
+        <button id="btn-makiwara-plus" class="stepper-btn plus">+</button>
       </div>
-    </button>
+    </section>
 
     <!-- Section Kinteki -->
     <section class="control-group">
       <h2>Kinteki</h2>
-      <div class="buttons-row">
-        <button id="btn-yosh" class="btn-icon expanded-hit">
-          <img src="icons/yosh.png" alt="Touché">
-        </button>
-        <button id="btn-batsu" class="btn-icon expanded-hit">
-          <img src="icons/batsu.png" alt="Raté">
-        </button>
+      <div class="stepper">
+        <span class="stepper-label">✅ Touchés</span>
+        <button id="btn-hits-minus" class="stepper-btn minus">−</button>
+        <span id="count-hits" class="stepper-count">0</span>
+        <button id="btn-hits-plus" class="stepper-btn plus">+</button>
+      </div>
+      <div class="stepper">
+        <span class="stepper-label">❌ Ratés</span>
+        <button id="btn-miss-minus" class="stepper-btn minus">−</button>
+        <span id="count-miss" class="stepper-count">0</span>
+        <button id="btn-miss-plus" class="stepper-btn plus">+</button>
       </div>
       <div class="stats-display">
-        <span id="count-kinteki">0</span> tirs | <span id="count-hits">0</span> hits
+        <span id="count-kinteki">0</span> tirs | <span id="count-percent">0</span>%
       </div>
     </section>
 
     <!-- Actions -->
     <section class="actions">
-      <button id="btn-save" class="btn-primary" disabled>Enregistrer la session</button>
+      <div class="control-group">
+        <label for="session-date">Date de la séance</label>
+        <input type="date" id="session-date" class="date-input">
+      </div>
+      <div class="actions-row">
+        <button id="btn-reset" class="btn-reset">↺ Reset</button>
+        <button id="btn-save" class="btn-primary" disabled>Enregistrer</button>
+      </div>
     </section>
   </div>
 

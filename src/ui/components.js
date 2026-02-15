@@ -1,16 +1,25 @@
 const countMakiwara = document.getElementById('count-makiwara');
 const countKinteki = document.getElementById('count-kinteki');
 const countHits = document.getElementById('count-hits');
+const countMiss = document.getElementById('count-miss');
+const countPercent = document.getElementById('count-percent');
 const btnSave = document.getElementById('btn-save');
 const historyList = document.getElementById('history');
 
 export function updateCounters(sessionData) {
-    countMakiwara.textContent = sessionData.getMakiwaraCount();
-    countKinteki.textContent = sessionData.getKintekiCount();
-    countHits.textContent = sessionData.getHits();
+    const hits = sessionData.getHits();
+    const total = sessionData.getKintekiCount();
+    const miss = total - hits;
 
-    // Activer le bouton enregistrer s'il y a au moins un tir
-    btnSave.disabled = (sessionData.isEmpty());
+    countMakiwara.textContent = sessionData.getMakiwaraCount();
+    countKinteki.textContent = total;
+    countHits.textContent = hits;
+
+    countMiss.textContent = miss;
+    const percent = total > 0 ? Math.round((hits / total) * 100) : 0;
+    countPercent.textContent = percent;
+
+    btnSave.disabled = sessionData.isEmpty();
 }
 
 export function displayHistory(sessions) {
@@ -27,12 +36,12 @@ export function displayHistory(sessions) {
 
         // Convertir la date
         const date = new Date(session.date);
-        let text = `${date.toLocaleString('fr-FR')}`;
+        let text = `${date.toLocaleDateString('fr-FR')}`;
 
         // Afficher l'arc si présent
         if (session.bowName) {
             text += ` — 🏹 ${session.bowName}`;
-            
+
             // Ajouter "(+ X autres arcs)" si plusieurs arcs utilisés
             if (session.otherBowsCount > 0) {
                 text += ` (+ ${session.otherBowsCount} autre${session.otherBowsCount > 1 ? 's' : ''} arc${session.otherBowsCount > 1 ? 's' : ''})`;

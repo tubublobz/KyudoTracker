@@ -65,6 +65,14 @@ class Session {
         });
     }
 
+    // Retire le dernier tir kinteki du type choisi
+    removeKinteki(isHit) {
+        let index = this.kintekiShots.findLastIndex(shot => shot.result === isHit)       
+        if (index !== -1 ) {
+            this.kintekiShots.splice(index, 1);  // Retire le isHit trouvé
+        }
+    }
+
     getKintekiShots(bowId = null) {
         if (bowId === null) {
             return this.kintekiShots;
@@ -86,7 +94,6 @@ class Session {
     reset() {
         this.makiwaraShots = [];
         this.kintekiShots = [];
-
     }
 
     toData() {

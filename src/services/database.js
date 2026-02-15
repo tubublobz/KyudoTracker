@@ -11,12 +11,12 @@ const DatabaseService = {
     // ==================== 1 - GESTION DES SESSIONS ====================
 
 
-    async saveSession(sessionData) {
+    async saveSession(sessionData, date) {
         // sessionData = { makiwara: 5, kinteki: [{result: true}, {result: false}] }
 
         // ÉTAPE 1 : Créer la session
         const sessionId = await db.sessions.add({
-            date: new Date(),
+            date: date || new Date(),
             location: 'Dojo',
             type: 'entrainement',
             initialBowId: sessionData.initialBowId || null

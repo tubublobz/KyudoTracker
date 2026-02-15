@@ -53,10 +53,14 @@ export async function initBowSelector(session) {
         bowSelect.appendChild(option);
     });
     
-    // 2. Écouter les changements
+    // 2. Écouter les changements - Setter l'arc par défaut si aucun tir encore
     bowSelect.addEventListener('change', (e) => {
         const bowId = e.target.value ? parseInt(e.target.value) : null;
-        session.setBow(bowId);
+        if (session.isEmpty()) {
+            session.setInitialBow(bowId);
+        } else {
+            session.setBow(bowId);
+        }
     });
 }
 
