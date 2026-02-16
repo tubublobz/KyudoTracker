@@ -1,6 +1,7 @@
 /* Reset & Base */
 * {
   box-sizing: border-box;
+  touch-action: manipulation
 }
 
 body {
