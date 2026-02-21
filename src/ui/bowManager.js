@@ -54,12 +54,13 @@ export async function initBowSelector(session) {
     });
     
     // 2. Écouter les changements - Setter l'arc par défaut si aucun tir encore
-    bowSelect.addEventListener('change', (e) => {
+    bowSelect.addEventListener('change', async (e) => {
         const bowId = e.target.value ? parseInt(e.target.value) : null;
-        if (session.isEmpty()) {
-            session.setInitialBow(bowId);
+        if (session.initialBowId === null) {
+            session.setInitialBow(bowId); // premier choix = intention
+            await DatabaseService.updateSessionBow(session.sessionId, bowId); // ← nouveau
         } else {
-            session.setBow(bowId);
+            session.setBow(bowId); // changement en cours = arc courant
         }
     });
 }

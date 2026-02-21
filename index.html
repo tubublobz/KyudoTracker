@@ -15,6 +15,10 @@
     <h1>Kyudo Tracker <span id="app-version" class="version">v0.8.0</span></h1>
     <button id="nav-bows-btn" class="btn-icon-nav" title="Mes arcs">🏹</button>
   </header>
+  <div class="date-banner">
+    <span class="date-banner-label">Séance du</span>
+    <input type="date" id="session-date" class="date-input">
+  </div>
   <div id="app-container">
     <!-- Sélection de l'arc -->
     <section class="control-group">
@@ -55,17 +59,7 @@
       </div>
     </section>
 
-    <!-- Actions -->
-    <section class="actions">
-      <div class="control-group">
-        <label for="session-date">Date de la séance</label>
-        <input type="date" id="session-date" class="date-input">
-      </div>
-      <div class="actions-row">
-        <button id="btn-reset" class="btn-reset">↺ Reset</button>
-        <button id="btn-save" class="btn-primary" disabled>Enregistrer</button>
-      </div>
-    </section>
+    <!-- Actions -- mémorial du bouton Enregistrer et Reset, disparus le 21 février 2026 au profit du autoSave !-->
   </div>
 
   <!-- Écran de gestion des arcs -->

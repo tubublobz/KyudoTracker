@@ -1,7 +1,8 @@
 /* Reset & Base */
 * {
   box-sizing: border-box;
-  touch-action: manipulation
+  touch-action: manipulation;
+  user-select: none;
 }
 
 body {
@@ -876,4 +877,22 @@ h2 {
   color: #e74c3c;
   cursor: pointer;
   font-weight: 500;
+}
+
+.date-banner {
+  background: #f5f4f0;
+  border-bottom: 1px solid #e7e5e0;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.date-banner-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #a8a29e;
 }

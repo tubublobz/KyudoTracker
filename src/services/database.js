@@ -13,37 +13,42 @@ const DatabaseService = {
 
     async saveSession(sessionData, date) {
         // sessionData = { makiwara: 5, kinteki: [{result: true}, {result: false}] }
-
-        // ÉTAPE 1 : Créer la session
-        const sessionId = await db.sessions.add({
-            date: date || new Date(),
-            location: 'Dojo',
-            type: 'entrainement',
-            initialBowId: sessionData.initialBowId || null
-        });
-
-        // ÉTAPE 2 : Sauvegarder les tirs makiwara
-        if (sessionData.makiwaraShots && sessionData.makiwaraShots.length > 0) {
-            const makiTirs = sessionData.makiwaraShots.map(shot => ({
-                sessionId: sessionId,
-                bowId: shot.bowId,  // ⭐ Ajouté
-                typeCode: 'maki'
-            }));
-            await db.shots.bulkAdd(makiTirs);
+        const existingSession = await this.getSessionByDate(date);
+        if (existingSession) {
+            // Nouveau code
         }
+        else {
+            // ÉTAPE 1 : Créer la session
+            const sessionId = await db.sessions.add({
+                date: date || new Date(),
+                location: 'Dojo',
+                type: 'entrainement',
+                initialBowId: sessionData.initialBowId || null
+            });
 
-        // ÉTAPE 3 : Sauvegarder les tirs kinteki
-        if (sessionData.kintekiShots && sessionData.kintekiShots.length > 0) {
-            const kintekiTirs = sessionData.kintekiShots.map(t => ({
-                sessionId: sessionId,
-                bowId: t.bowId,
-                typeCode: 'kinteki28',
-                result: t.result
-            }));
-            await db.shots.bulkAdd(kintekiTirs);
+            // ÉTAPE 2 : Sauvegarder les tirs makiwara
+            if (sessionData.makiwaraShots && sessionData.makiwaraShots.length > 0) {
+                const makiTirs = sessionData.makiwaraShots.map(shot => ({
+                    sessionId: sessionId,
+                    bowId: shot.bowId,  // ⭐ Ajouté
+                    typeCode: 'maki'
+                }));
+                await db.shots.bulkAdd(makiTirs);
+            }
+
+            // ÉTAPE 3 : Sauvegarder les tirs kinteki
+            if (sessionData.kintekiShots && sessionData.kintekiShots.length > 0) {
+                const kintekiTirs = sessionData.kintekiShots.map(t => ({
+                    sessionId: sessionId,
+                    bowId: t.bowId,
+                    typeCode: 'kinteki28',
+                    result: t.result
+                }));
+                await db.shots.bulkAdd(kintekiTirs);
+            }
+
+            return sessionId;
         }
-
-        return sessionId;
     },
 
     // Charger l'historique (V3 avec les arcs utilisés)
@@ -91,6 +96,70 @@ const DatabaseService = {
         );
     },
 
+    async getSessionByDate(date) {
+        // Normaliser la date (00:00:00 du jour)
+        const targetDate = new Date(date);
+        targetDate.setHours(0, 0, 0, 0);
+
+        // Chercher la session
+        const session = await db.sessions
+            .where('date')
+            .equals(targetDate)
+            .first();
+
+        if (!session) {
+            return null;  // Pas de session ce jour-là
+        }
+
+        // Charger les tirs de cette session
+        const shots = await db.shots
+            .where('sessionId')
+            .equals(session.id)
+            .toArray();
+
+        // Retourner session + tirs
+        return {
+            sessionId: session.id,
+            date: session.date,
+            initialBowId: session.initialBowId,
+            shots: shots
+        };
+    },
+    async createOrGetSessionByDate(date) {
+        // 1. Chercher si une session existe déjà
+        const existing = await this.getSessionByDate(date);
+
+        // 2. Si elle existe → on retourne juste son id
+        if (existing) {
+            return existing.sessionId;
+        }
+
+        // 3. Sinon → on crée une session vide
+        const targetDate = new Date(date);
+        targetDate.setHours(0, 0, 0, 0);
+
+        const sessionId = await db.sessions.add({
+            date: targetDate,
+            initialBowId: null
+        });
+
+        return sessionId;
+    },
+
+    async getSessionStats(sessionId) {
+        const shots = await db.shots
+            .where('sessionId')
+            .equals(sessionId)
+            .toArray();
+
+        const makiwara = shots.filter(s => s.typeCode == 'maki').length;
+        const kintekiShots = shots.filter(s => s.typeCode == 'kinteki28');
+        const kintekiHits = kintekiShots.filter(s => s.result == true).length;
+        const kintekiTotal = kintekiShots.length;
+        const percent = kintekiTotal > 0 ? Math.round((kintekiHits / kintekiTotal) * 100) : 0;
+
+        return { makiwara, kintekiHits, kintekiTotal, percent };
+    },
     // ==================== 2 - GESTION DES ARCS ====================
 
     async createBow(bowData) {
@@ -157,7 +226,41 @@ const DatabaseService = {
 
         // 3. Définir le nouvel arc par défaut
         await db.bows.update(id, { isDefault: true });
-    }
+    },
+    
+    async updateSessionBow(sessionId, bowId) {
+        await db.sessions.update(sessionId, { initialBowId: bowId });
+    },
+
+    // =================== 3 - GESTION DES TIRS ================
+    async addShot(sessionId, shotData) {
+        const shotId = await db.shots.add({
+            sessionId: sessionId,
+            bowId: shotData.bowId,
+            typeCode: shotData.typeCode,
+            result: shotData.result // undefined si pas fourni, c'est OK
+        });
+        return shotId;
+    },
+    async removeLastShot(sessionId, typeCode, result) {
+        const shots = await db.shots
+            .where('sessionId')
+            .equals(sessionId)
+            .and(shot => (shot.typeCode == typeCode && shot.result == result))  // filtrer par typeCode
+            .toArray();
+
+        if (shots.length === 0) return null;
+
+        const lastShot = shots[shots.length - 1];
+        await db.shots.delete(lastShot.id);
+        return true;
+    },
+    async deleteAllShots(sessionId) {
+        await db.shots
+            .where('sessionId')
+            .equals(sessionId)
+            .delete();
+    },
 };
 
 export default DatabaseService;

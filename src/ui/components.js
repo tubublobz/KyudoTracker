@@ -3,23 +3,17 @@ const countKinteki = document.getElementById('count-kinteki');
 const countHits = document.getElementById('count-hits');
 const countMiss = document.getElementById('count-miss');
 const countPercent = document.getElementById('count-percent');
-const btnSave = document.getElementById('btn-save');
 const historyList = document.getElementById('history');
 
-export function updateCounters(sessionData) {
-    const hits = sessionData.getHits();
-    const total = sessionData.getKintekiCount();
-    const miss = total - hits;
+export function updateCounters(stats) {
+    // stats = { makiwara, kintekiHits, kintekiTotal, percent }
+    const miss = stats.kintekiTotal - stats.kintekiHits;
 
-    countMakiwara.textContent = sessionData.getMakiwaraCount();
-    countKinteki.textContent = total;
-    countHits.textContent = hits;
-
+    countMakiwara.textContent = stats.makiwara;
+    countKinteki.textContent = stats.kintekiTotal;
+    countHits.textContent = stats.kintekiHits;
     countMiss.textContent = miss;
-    const percent = total > 0 ? Math.round((hits / total) * 100) : 0;
-    countPercent.textContent = percent;
-
-    btnSave.disabled = sessionData.isEmpty();
+    countPercent.textContent = stats.percent;
 }
 
 export function displayHistory(sessions) {
@@ -60,12 +54,6 @@ export function displayHistory(sessions) {
         li.innerHTML = text;
         historyList.appendChild(li);
     }
-}
-
-export function triggerBounce(element) {
-    element.classList.remove('bouncy');
-    void element.offsetWidth; // Trigger reflow
-    element.classList.add('bouncy');
 }
 
 export function showUpdateNotification(worker) {

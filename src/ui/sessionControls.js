@@ -2,9 +2,25 @@ import { showNotification } from './notifications.js';
 import * as UI from './components.js';
 import DatabaseService from '../services/database.js';
 
+// Pour gérer l'affichage à chaque clic
+async function refreshCounters(session) {
+    const stats = await session.getStats();
+    UI.updateCounters(stats);
+}
 
+// Pour gérer les try catch lor de l'ajout de tirs
+async function handleShotAction(action, session) {
+    try {
+        await action();
+        await refreshCounters(session);
+    } catch (error) {
+        console.error('❌ Erreur:', error);
+        showNotification('Erreur', 'error');
+    }
+}
 
-export function initSessionControls(session, onSave) {
+// Pour initier tout le DOM
+export async function initSessionControls(session) {
     // Éléments du DOM
     const btnMakiwaraPlus = document.getElementById('btn-makiwara-plus');
     const btnMakiwaraMinus = document.getElementById('btn-makiwara-minus');
@@ -12,69 +28,37 @@ export function initSessionControls(session, onSave) {
     const btnHitsMinus = document.getElementById('btn-hits-minus');
     const btnMissPlus = document.getElementById('btn-miss-plus');
     const btnMissMinus = document.getElementById('btn-miss-minus');
-    const btnReset = document.getElementById('btn-reset');
     const sessionDate = document.getElementById('session-date');
-    const btnSave = document.getElementById('btn-save');
 
-    // Makiwara
-    btnMakiwaraPlus.addEventListener('click', () => {
-        session.addMakiwara();
-        UI.updateCounters(session);
-    });
-
-    btnMakiwaraMinus.addEventListener('click', () => {
-        session.removeMakiwara();
-        UI.updateCounters(session);
-    });
-
-    // Kinteki
-    btnHitsPlus.addEventListener('click', () => {
-        session.addKinteki(true);
-        UI.updateCounters(session);
-    });
-
-    btnHitsMinus.addEventListener('click', () => {
-        session.removeKinteki(true);
-        UI.updateCounters(session);
-    });
-
-    btnMissPlus.addEventListener('click', () => {
-        session.addKinteki(false);
-        UI.updateCounters(session);
-    });
-
-    btnMissMinus.addEventListener('click', () => {
-        session.removeKinteki(false);
-        UI.updateCounters(session);
-    });
-
-    // Reset
-    btnReset.addEventListener('click', () => {
-        console.log('Reset cliqué');
-        const confirmed = confirm('Remettre la session à zéro ?');
-        if (confirmed) {
-            session.reset();
-            UI.updateCounters(session);
-        }
-    });
-
-    // Date — initialiser à aujourd'hui
+    // 1. Initialiser la date à aujourd'hui
     const today = new Date().toISOString().split('T')[0];
     sessionDate.value = today;
 
-    // Enregistrer
-    btnSave.addEventListener('click', async () => {
-        try {
-            const date = new Date(sessionDate.value);
-            await DatabaseService.saveSession(session.toData(), date);
-            showNotification('Session enregistrée avec succès', 'success');
-            session.reset();
-            UI.updateCounters(session);
-            await onSave();
+    // 2. Créer ou charger la session du jour
+    session.sessionId = await DatabaseService.createOrGetSessionByDate(today);
 
-        } catch (error) {
-            console.error('❌ Erreur:', error);
-            showNotification('Erreur lors de l\'enregistrement', 'error');
-        }
-    });
+    // 3. Afficher les stats initiales
+    await refreshCounters(session);
+
+    // Makiwara
+    btnMakiwaraPlus.addEventListener('click', () =>
+        handleShotAction(() => session.addMakiwara(), session)
+    );
+    btnMakiwaraMinus.addEventListener('click', () =>
+        handleShotAction(() => session.removeMakiwara(), session)
+    );
+
+    // Kinteki
+    btnHitsPlus.addEventListener('click', () =>
+        handleShotAction(() => session.addKinteki(true), session)
+    );
+    btnHitsMinus.addEventListener('click', () =>
+        handleShotAction(() => session.removeKinteki(true), session)
+    );
+    btnMissPlus.addEventListener('click', () =>
+        handleShotAction(() => session.addKinteki(false), session)
+    );
+    btnMissMinus.addEventListener('click', () =>
+        handleShotAction(() => session.removeKinteki(false), session)
+    );
 }
