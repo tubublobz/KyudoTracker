@@ -896,3 +896,8 @@ h2 {
   text-transform: uppercase;
   color: #a8a29e;
 }
+
+#history li.session-active {
+    opacity: 0.5;
+    cursor: default;
+}

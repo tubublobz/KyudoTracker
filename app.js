@@ -19,16 +19,10 @@ document.getElementById('nav-bows-btn').addEventListener('click', () => {
   showBowsScreen();
 });
 
-async function loadHistory() {
-  const sessions = await DatabaseService.loadHistory();
-  UI.displayHistory(sessions);
-}
-
 document.addEventListener('DOMContentLoaded', async () => {
   console.log('🚀 Chargement de l\'application...');
   await DatabaseService.init();
   initBowManager();
-  await initBowSelector(currentSession);
   await initSessionControls(currentSession);
-  await loadHistory();
+  await initBowSelector(currentSession);
 });

@@ -16,7 +16,7 @@ export function updateCounters(stats) {
     countPercent.textContent = stats.percent;
 }
 
-export function displayHistory(sessions) {
+export function displayHistory(sessions, currentSessionId, onSessionSelect) {
     historyList.innerHTML = "";
 
     if (sessions.length === 0) {
@@ -28,9 +28,19 @@ export function displayHistory(sessions) {
     for (const session of sessions) {
         const li = document.createElement("li");
 
+        // rendre cliquable chaque séance pour naviguer vers elle
+        if (session.id === currentSessionId) {
+            li.classList.add('session-active');
+        } else {
+            li.addEventListener('click', () => onSessionSelect(session.id, li.dataset.sessionDate));
+            li.style.cursor = 'pointer';
+        }
+
         // Convertir la date
-        const date = new Date(session.date);
-        let text = `${date.toLocaleDateString('fr-FR')}`;
+        const d = new Date(session.date);
+        li.dataset.sessionDate = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; 
+
+        let text = `${d.toLocaleDateString('fr-FR')}`;
 
         // Afficher l'arc si présent
         if (session.bowName) {

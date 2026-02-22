@@ -39,19 +39,22 @@ export async function initBowSelector(session) {
     // 1. Charger les arcs
     bowSelect.innerHTML = '<option value="">Aucun arc sélectionné</option>';
     
-    bows.forEach(bow => {
-        const option = document.createElement('option');
-        option.value = bow.id;
-        option.textContent = bow.name;
-        
-        if (bow.isDefault) {
-            option.selected = true;
-            session.initialBowId = bow.id;   
-            session.currentBowId = bow.id;    
-        }
-        
-        bowSelect.appendChild(option);
-    });
+for (const bow of bows) {
+    const option = document.createElement('option');
+    option.value = bow.id;
+    option.textContent = bow.name;
+    
+    if (bow.isDefault) {
+        option.selected = true;
+        session.initialBowId = bow.id;
+        session.currentBowId = bow.id;
+    console.log('session.sessionId au moment du update:', session.sessionId);
+    console.log('bow.id:', bow.id);
+        await DatabaseService.updateSessionBow(session.sessionId, bow.id);
+    }
+    
+    bowSelect.appendChild(option);
+}
     
     // 2. Écouter les changements - Setter l'arc par défaut si aucun tir encore
     bowSelect.addEventListener('change', async (e) => {

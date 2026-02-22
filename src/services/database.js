@@ -59,40 +59,39 @@ const DatabaseService = {
 
         return Promise.all(
             sessions.map(async (s) => {
-                // Récupérer les tirs
-                const shots = await db.shots.where('sessionId').equals(s.id).toArray();
+                    // Récupérer les tirs
+                    const shots = await db.shots.where('sessionId').equals(s.id).toArray();
 
-                // Filtrer par type de tir
-                const makiwaraShots = shots.filter(t => t.typeCode === 'maki');
-                const kintekiShots = shots.filter(t => t.typeCode === 'kinteki28');
-                const kintekiHits = kintekiShots.filter(t => t.result === true)
+                    // Filtrer par type de tir
+                    const makiwaraShots = shots.filter(t => t.typeCode === 'maki');
+                    const kintekiShots = shots.filter(t => t.typeCode === 'kinteki28');
+                    const kintekiHits = kintekiShots.filter(t => t.result === true)
 
-                // Récupérer le nom de l'arc initial
-                let bowName = null;
-                if (s.initialBowId) {
-                    const bow = await db.bows.get(s.initialBowId);
-                    bowName = bow ? bow.name : null;
-                    console.log(bowName);
-                }
-
-                // Compter les arcs différents utilisés (autres que l'initial)
-                const uniqueBowIds = [...new Set(shots.map(shot => shot.bowId))];
-                const otherBowsCount = uniqueBowIds.filter(id => id !== s.initialBowId && id !== null).length;
-                return {
-                    id: s.id,
-                    date: s.date,
-                    location: s.location,
-                    type: s.type,
-                    initialBowId: s.initialBowId,
-                    bowName: bowName,
-                    otherBowsCount: otherBowsCount,
-                    stats: {
-                        makiwara: makiwaraShots.length,
-                        kintekiTotal: kintekiShots.length,
-                        kintekiHits: kintekiHits.length
+                    // Récupérer le nom de l'arc initial
+                    let bowName = null;
+                    if (s.initialBowId) {
+                        const bow = await db.bows.get(s.initialBowId);
+                        bowName = bow ? bow.name : null;
                     }
-                };
-            })
+
+                    // Compter les arcs différents utilisés (autres que l'initial)
+                    const uniqueBowIds = [...new Set(shots.map(shot => shot.bowId))];
+                    const otherBowsCount = uniqueBowIds.filter(id => id !== s.initialBowId && id !== null).length;
+                    return {
+                        id: s.id,
+                        date: s.date,
+                        location: s.location,
+                        type: s.type,
+                        initialBowId: s.initialBowId,
+                        bowName: bowName,
+                        otherBowsCount: otherBowsCount,
+                        stats: {
+                            makiwara: makiwaraShots.length,
+                            kintekiTotal: kintekiShots.length,
+                            kintekiHits: kintekiHits.length
+                        }
+                    };
+                })
         );
     },
 
@@ -227,7 +226,7 @@ const DatabaseService = {
         // 3. Définir le nouvel arc par défaut
         await db.bows.update(id, { isDefault: true });
     },
-    
+
     async updateSessionBow(sessionId, bowId) {
         await db.sessions.update(sessionId, { initialBowId: bowId });
     },
