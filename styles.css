@@ -901,3 +901,225 @@ h2 {
     opacity: 0.5;
     cursor: default;
 }
+
+/* ==================== GRILLE DE PASSAGES ==================== */
+
+:root {
+    --hit: #16a34a;
+    --hit-bg: #f0fdf4;
+    --hit-border: #bbf7d0;
+    --miss: #dc2626;
+    --miss-bg: #fff5f5;
+    --miss-border: #fecaca;
+    --maki: #0F6E56;
+    --maki-bg: #f0fdf8;
+    --maki-border: #9FE1CB;
+    --ink-muted: #a8a29e;
+    --border: #e7e5e0;
+    --paper-2: #f5f4f0;
+}
+
+.passage-block {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 6px;
+}
+
+.passage-block.is-maki {
+    border-color: var(--maki-border);
+}
+
+.passage-top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+}
+
+.passage-num {
+    font-size: 11px;
+    color: var(--ink-muted);
+    min-width: 16px;
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.shots {
+    display: flex;
+    gap: 5px;
+    flex: 1;
+}
+
+.shot-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border);
+    background: var(--paper-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+    cursor: pointer;
+}
+
+.shot-btn.hit {
+    background: var(--hit-bg);
+    border-color: var(--hit-border);
+    color: var(--hit);
+}
+
+.shot-btn.miss {
+    background: var(--miss-bg);
+    border-color: var(--miss-border);
+    color: var(--miss);
+}
+
+.shot-btn.void {
+    background: var(--paper-2);
+    border-color: var(--border);
+}
+
+.maki-trigger {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1.5px dashed var(--maki-border);
+    background: transparent;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    opacity: 0.6;
+    cursor: pointer;
+}
+
+.maki-row {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    gap: 0;
+}
+
+.maki-label-txt {
+    font-size: 12px;
+    color: var(--maki);
+    flex: 1;
+    padding-left: 2px;
+}
+
+.maki-stepper {
+    display: flex;
+    align-items: center;
+    border: 1.5px solid var(--maki-border);
+    border-radius: 20px;
+    overflow: hidden;
+    background: var(--maki-bg);
+    height: 38px;
+}
+
+.maki-btn {
+    width: 34px;
+    height: 38px;
+    border: none;
+    background: none;
+    font-size: 18px;
+    color: var(--maki);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.maki-count {
+    min-width: 28px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--maki);
+    padding: 0 2px;
+}
+
+.maki-plus {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1.5px solid var(--maki-border);
+    background: var(--maki-bg);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: var(--maki);
+    cursor: pointer;
+}
+
+.passage-meta {
+    display: flex;
+    gap: 6px;
+    padding: 0 10px 8px 26px;
+}
+
+.meta-pill {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: var(--paper-2);
+    font-size: 11px;
+    color: var(--ink-muted);
+    cursor: pointer;
+}
+
+.meta-pill.filled {
+    color: var(--ink, #1c1917);
+    border-color: #ccc;
+}
+
+.stats-bar {
+    display: flex;
+    gap: 0;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-top: 6px;
+}
+
+.stat {
+    flex: 1;
+    text-align: center;
+    padding: 10px 6px;
+    border-right: 1px solid var(--border);
+}
+
+.stat:last-child {
+    border-right: none;
+}
+
+.stat-value {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--ink, #1c1917);
+    display: block;
+}
+
+.stat-value.green { color: var(--hit); }
+.stat-value.red { color: var(--miss); }
+.stat-value.teal { color: var(--maki); }
+
+.stat-label {
+    font-size: 10px;
+    color: var(--ink-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-top: 1px;
+    display: block;
+}

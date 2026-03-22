@@ -7,7 +7,7 @@ let sessionDate;
 // Pour gérer l'affichage à chaque clic
 async function refreshCounters(session) {
     const stats = await session.getStats();
-    UI.updateCounters(stats);
+    // UI.updateCounters(stats);
 }
 
 // Pour gérer les try catch lor de l'ajout de tirs
@@ -38,12 +38,6 @@ async function loadSessionById(sessionId, date, session) {
 // Pour initier tout le DOM
 export async function initSessionControls(session) {
     // Éléments du DOM
-    const btnMakiwaraPlus = document.getElementById('btn-makiwara-plus');
-    const btnMakiwaraMinus = document.getElementById('btn-makiwara-minus');
-    const btnHitsPlus = document.getElementById('btn-hits-plus');
-    const btnHitsMinus = document.getElementById('btn-hits-minus');
-    const btnMissPlus = document.getElementById('btn-miss-plus');
-    const btnMissMinus = document.getElementById('btn-miss-minus');
     sessionDate = document.getElementById('session-date');
 
     // 1. Initialiser la date à aujourd'hui
@@ -69,27 +63,4 @@ export async function initSessionControls(session) {
         await refreshCounters(session);
         await loadHistory(session);
     });
-
-    // Makiwara
-    btnMakiwaraPlus.addEventListener('click', () =>
-        handleShotAction(() => session.addMakiwara(), session)
-    );
-    btnMakiwaraMinus.addEventListener('click', () =>
-        handleShotAction(() => session.removeMakiwara(), session)
-    );
-
-    // Kinteki
-    btnHitsPlus.addEventListener('click', () =>
-        handleShotAction(() => session.addKinteki(true), session)
-    );
-    btnHitsMinus.addEventListener('click', () =>
-        handleShotAction(() => session.removeKinteki(true), session)
-    );
-    btnMissPlus.addEventListener('click', () =>
-        handleShotAction(() => session.addKinteki(false), session)
-    );
-    btnMissMinus.addEventListener('click', () =>
-        handleShotAction(() => session.removeKinteki(false), session)
-    );
-
 }

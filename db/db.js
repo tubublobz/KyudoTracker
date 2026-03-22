@@ -2,11 +2,11 @@ import { seedDatabase } from './seed-data.js';
 
 const db = new Dexie('KyudoTrackerDB');
 
-// Définition du schéma V6
-db.version(6).stores({
+// Définition du schéma V7
+db.version(7).stores({
     sessions: '++id, date, location, type, initialBowId',
     shots: '++id, sessionId, shareiId, bowId, typeCode, result',
-    sharei: '++id, sessionId',
+    sharei: '++id, sessionId, order',
     bows: '++id, name, strength, status, isDefault',
     shotTypes: '++id, code'
 });

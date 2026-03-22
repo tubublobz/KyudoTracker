@@ -3,7 +3,8 @@ import * as UI from './src/ui/components.js';
 import Session from './src/models/Session.js';
 import { initSessionControls } from './src/ui/sessionControls.js';
 import { initServiceWorker } from './src/utils/serviceWorker.js';
-import { initBowSelector, initBowManager, showBowsScreen } from './src/ui/bowManager.js'; 
+import { initBowSelector, initBowManager, showBowsScreen } from './src/ui/bowManager.js';
+import { initRoundGrid } from './src/ui/roundGrid.js';
 
 console.log('✅ Base de données chargée depuis le module');
 
@@ -24,5 +25,5 @@ document.addEventListener('DOMContentLoaded', async () => {
   await DatabaseService.init();
   initBowManager();
   await initSessionControls(currentSession);
-  await initBowSelector(currentSession);
+  await initRoundGrid(currentSession);
 });

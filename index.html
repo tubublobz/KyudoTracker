@@ -20,46 +20,8 @@
     <input type="date" id="session-date" class="date-input">
   </div>
   <div id="app-container">
-    <!-- Sélection de l'arc -->
-    <section class="control-group">
-      <h2>Arc</h2>
-      <select id="bow-select" class="bow-selector">
-        <option value="">Aucun arc sélectionné</option>
-        <!-- Les arcs seront chargés en JS -->
-      </select>
-    </section>
-    <!-- Section Makiwara -->
-    <section class="control-group">
-      <h2>Makiwara</h2>
-      <div class="stepper">
-        <span class="stepper-label">🎯 Tirs</span>
-        <button id="btn-makiwara-minus" class="stepper-btn minus">−</button>
-        <span id="count-makiwara" class="stepper-count">0</span>
-        <button id="btn-makiwara-plus" class="stepper-btn plus">+</button>
-      </div>
-    </section>
-
-    <!-- Section Kinteki -->
-    <section class="control-group">
-      <h2>Kinteki</h2>
-      <div class="stepper">
-        <span class="stepper-label">✅ Touchés</span>
-        <button id="btn-hits-minus" class="stepper-btn minus">−</button>
-        <span id="count-hits" class="stepper-count">0</span>
-        <button id="btn-hits-plus" class="stepper-btn plus">+</button>
-      </div>
-      <div class="stepper">
-        <span class="stepper-label">❌ Ratés</span>
-        <button id="btn-miss-minus" class="stepper-btn minus">−</button>
-        <span id="count-miss" class="stepper-count">0</span>
-        <button id="btn-miss-plus" class="stepper-btn plus">+</button>
-      </div>
-      <div class="stats-display">
-        <span id="count-kinteki">0</span> tirs | <span id="count-percent">0</span>%
-      </div>
-    </section>
-
-    <!-- Actions -- mémorial du bouton Enregistrer et Reset, disparus le 21 février 2026 au profit du autoSave !-->
+    <div id="rounds-container"></div> 
+    <div id="round-stats" class="stats-bar"></div>
   </div>
 
   <!-- Écran de gestion des arcs -->

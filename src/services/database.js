@@ -237,6 +237,8 @@ const DatabaseService = {
             sessionId: sessionId,
             bowId: shotData.bowId,
             typeCode: shotData.typeCode,
+            shareiId: shotData.shareiId,
+            slot: shotData.slot, // #[0,3]
             result: shotData.result // undefined si pas fourni, c'est OK
         });
         return shotId;
@@ -259,6 +261,57 @@ const DatabaseService = {
             .where('sessionId')
             .equals(sessionId)
             .delete();
+    },
+    async getShotsByRound(roundId){
+        const shots = await db.shots
+            .where('shareiId')
+            .equals(roundId)
+            .sortBy('id');
+        return shots; 
+    },
+
+    async updateShot(shotId, updates){
+        await db.shots.update(shotId, updates);
+    },
+
+    async deleteShotById(shotId){
+        await db.shots.delete(shotId);
+    },
+
+// =================== 4 - GESTION DES PASSAGES ================
+
+    async createRound(sessionId) {
+        // 1. Calculer l'ordre du prochain passage
+        const existing = await db.sharei
+            .where('sessionId')
+            .equals(sessionId)
+            .count();
+
+        // 2. Créer le passage neutre
+        const round = {
+            sessionId: sessionId,
+            order: existing + 1,
+            isMakiwara: null,
+            bowId: null,
+            notes: null
+        };
+
+        // 3. Insérer et récupérer l'id
+        round.id = await db.sharei.add(round);
+
+        return round;
+    },
+
+    async getRounds(sessionId) {
+        const rounds = await db.sharei
+            .where('sessionId')
+            .equals(sessionId)
+            .sortBy('order');
+        return rounds;   
+    },
+
+    async updateRound(roundId, updates){
+        await db.sharei.update(roundId, updates)
     },
 };
 
