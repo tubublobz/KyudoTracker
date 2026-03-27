@@ -930,7 +930,9 @@ h2 {
 .passage-block.is-maki {
     border-color: var(--maki-border);
 }
-
+.passage-block.inactive {
+    opacity: 0.6;
+}
 .passage-top {
     display: flex;
     align-items: center;

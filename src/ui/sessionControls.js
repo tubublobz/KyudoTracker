@@ -3,6 +3,8 @@ import * as UI from './components.js';
 import DatabaseService from '../services/database.js';
 
 let sessionDate;
+let onDateChangeCb; // Callback injecté par app.js via initSessionControls
+
 
 // Pour gérer l'affichage à chaque clic
 async function refreshCounters(session) {
@@ -33,12 +35,14 @@ async function loadSessionById(sessionId, date, session) {
     sessionDate.value = date;
     await refreshCounters(session);
     await loadHistory(session);
+    await onDateChangeCb(session); // ← ajouter cette ligne
 }
 
 // Pour initier tout le DOM
-export async function initSessionControls(session) {
+export async function initSessionControls(session, onDateChange) {
     // Éléments du DOM
     sessionDate = document.getElementById('session-date');
+    onDateChangeCb = onDateChange;
 
     // 1. Initialiser la date à aujourd'hui
     const today = new Date().toISOString().split('T')[0];
@@ -62,5 +66,6 @@ export async function initSessionControls(session) {
         }
         await refreshCounters(session);
         await loadHistory(session);
+        await onDateChange(session);
     });
 }

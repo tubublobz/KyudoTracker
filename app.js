@@ -24,6 +24,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   console.log('🚀 Chargement de l\'application...');
   await DatabaseService.init();
   initBowManager();
-  await initSessionControls(currentSession);
+  await initSessionControls(currentSession, initRoundGrid);
   await initRoundGrid(currentSession);
 });

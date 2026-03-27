@@ -1,11 +1,16 @@
 import DatabaseService from '../services/database.js';
+import { updateStatsBar } from './components.js';
+
 const SHOTS_PER_ROUND = 4;
 
-function renderRound(round, shots = []) {
+function renderRound(round, shots = [], isLast = false) {
     const isNeutral = round.isMakiwara === null;
     const isMaki = round.isMakiwara === true;
 
-    const blockClass = isMaki ? 'passage-block is-maki' : 'passage-block';
+    let blockClass = 'passage-block';
+    if (isMaki) blockClass += ' is-maki';
+    if (isLast && isNeutral) blockClass += ' inactive';
+    console.log('round', round.order, 'isLast:', isLast, 'isNeutral:', isNeutral, 'blockClass:', blockClass);
 
     let content = '';
 
@@ -63,7 +68,7 @@ function renderRound(round, shots = []) {
 
 function renderGrid(container, roundsWithShots) {
     container.innerHTML = roundsWithShots
-        .map(({ round, shots }) => renderRound(round, shots))
+        .map(({ round, shots }, index) => renderRound(round, shots, index === roundsWithShots.length - 1))
         .join('');
 }
 
@@ -87,6 +92,8 @@ export async function initRoundGrid(session) {
 
     renderGrid(container, roundsWithShots);
     attachGridListeners(container, session);
+    const stats = await DatabaseService.getSessionStats(session.sessionId);
+    updateStatsBar(stats);
 }
 
 function attachGridListeners(container, session) {
@@ -161,7 +168,9 @@ function attachGridListeners(container, session) {
             await DatabaseService.createRound(session.sessionId);
         }
 
-        // 6. Refresh la grille
+        // 6. Refresh la grille & stats
+        const stats = await DatabaseService.getSessionStats(session.sessionId);
+        updateStatsBar(stats);
         await initRoundGrid(session);
     });
 }

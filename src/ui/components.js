@@ -82,3 +82,25 @@ export function showUpdateNotification(worker) {
         notification.classList.add('hidden');
     });
 }
+
+export function updateStatsBar(stats) {
+    const container = document.getElementById('round-stats');
+    container.innerHTML = `
+        <div class="stat">
+            <span class="stat-value green">${stats.kintekiHits}</span>
+            <span class="stat-label">touchés</span>
+        </div>
+        <div class="stat">
+            <span class="stat-value red">${stats.kintekiTotal - stats.kintekiHits}</span>
+            <span class="stat-label">ratés</span>
+        </div>
+        <div class="stat">
+            <span class="stat-value">${stats.percent}%</span>
+            <span class="stat-label">réussite</span>
+        </div>
+        <div class="stat">
+            <span class="stat-value teal">${stats.makiwara}</span>
+            <span class="stat-label">makiwara</span>
+        </div>
+    `;
+}
