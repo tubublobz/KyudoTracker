@@ -1,5 +1,6 @@
 import DatabaseService from '../services/database.js';
 import { updateStatsBar } from './components.js';
+import { showBowsScreen } from './bowManager.js';
 
 const SHOTS_PER_ROUND = 4;
 
@@ -173,6 +174,11 @@ function attachGridListeners(container, session, activeBows) {
         }
         // 5. Clic sur pill Arc
         if (action === 'set-bow') {
+            // Check : aucun arc disponible → ouvrir l'écran arcs
+            if (activeBows.length === 0) {
+                showBowsScreen();
+                return;
+            }
             // a) Fermer un éventuel dropdown déjà ouvert
             const existing = container.querySelector('.bow-dropdown');
             if (existing) existing.remove();

@@ -31,44 +31,6 @@ export function hideBowsScreen() {
 
 // ==================== LISTE DES ARCS ====================
 
-// Charger les arcs dans le sélecteur et initialiser avec l'arc par défaut
-export async function initBowSelector(session) {
-    const bowSelect = document.getElementById('bow-select');
-    const bows = await DatabaseService.getActiveBows();
-    
-    // 1. Charger les arcs
-    bowSelect.innerHTML = '<option value="">Aucun arc sélectionné</option>';
-    
-for (const bow of bows) {
-    const option = document.createElement('option');
-    option.value = bow.id;
-    option.textContent = bow.name;
-    
-    if (bow.isDefault) {
-        option.selected = true;
-        session.initialBowId = bow.id;
-        session.currentBowId = bow.id;
-    console.log('session.sessionId au moment du update:', session.sessionId);
-    console.log('bow.id:', bow.id);
-        await DatabaseService.updateSessionBow(session.sessionId, bow.id);
-    }
-    
-    bowSelect.appendChild(option);
-}
-    
-    // 2. Écouter les changements - Setter l'arc par défaut si aucun tir encore
-    bowSelect.addEventListener('change', async (e) => {
-        const bowId = e.target.value ? parseInt(e.target.value) : null;
-        if (session.initialBowId === null) {
-            session.setInitialBow(bowId); // premier choix = intention
-            await DatabaseService.updateSessionBow(session.sessionId, bowId); // ← nouveau
-        } else {
-            session.setBow(bowId); // changement en cours = arc courant
-        }
-    });
-}
-
-
 async function renderBowsList() {
     const bows = await DatabaseService.getActiveBows();
     const bowsListElement = document.getElementById('bows-list');
@@ -350,9 +312,12 @@ async function setAsDefault(bowId) {
 // ==================== INITIALISATION ====================
 
 
-export function initBowManager() {
+export function initBowManager(onReturn) {
     // Bouton "← Retour"
-    document.getElementById('back-from-bows-btn').addEventListener('click', hideBowsScreen);
+    document.getElementById('back-from-bows-btn').addEventListener('click', async () => {
+        hideBowsScreen();
+        if (onReturn) await onReturn();
+    });
 
     // Bouton "+ Ajouter un arc" 
     document.getElementById('add-bow-btn').addEventListener('click', () => openBowForm(null));

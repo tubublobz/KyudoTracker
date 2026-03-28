@@ -3,7 +3,7 @@ import * as UI from './src/ui/components.js';
 import Session from './src/models/Session.js';
 import { initSessionControls } from './src/ui/sessionControls.js';
 import { initServiceWorker } from './src/utils/serviceWorker.js';
-import { initBowSelector, initBowManager, showBowsScreen } from './src/ui/bowManager.js';
+import { initBowManager, showBowsScreen } from './src/ui/bowManager.js';
 import { initRoundGrid } from './src/ui/roundGrid.js';
 
 console.log('✅ Base de données chargée depuis le module');
@@ -23,7 +23,7 @@ document.getElementById('nav-bows-btn').addEventListener('click', () => {
 document.addEventListener('DOMContentLoaded', async () => {
   console.log('🚀 Chargement de l\'application...');
   await DatabaseService.init();
-  initBowManager();
+  initBowManager(async () => await initRoundGrid(currentSession));
   await initSessionControls(currentSession, initRoundGrid);
   await initRoundGrid(currentSession);
 });

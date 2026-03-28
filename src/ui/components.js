@@ -1,20 +1,4 @@
-const countMakiwara = document.getElementById('count-makiwara');
-const countKinteki = document.getElementById('count-kinteki');
-const countHits = document.getElementById('count-hits');
-const countMiss = document.getElementById('count-miss');
-const countPercent = document.getElementById('count-percent');
 const historyList = document.getElementById('history');
-
-export function updateCounters(stats) {
-    // stats = { makiwara, kintekiHits, kintekiTotal, percent }
-    const miss = stats.kintekiTotal - stats.kintekiHits;
-
-    countMakiwara.textContent = stats.makiwara;
-    countKinteki.textContent = stats.kintekiTotal;
-    countHits.textContent = stats.kintekiHits;
-    countMiss.textContent = miss;
-    countPercent.textContent = stats.percent;
-}
 
 export function displayHistory(sessions, currentSessionId, onSessionSelect) {
     historyList.innerHTML = "";
