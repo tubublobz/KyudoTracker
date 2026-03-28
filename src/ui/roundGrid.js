@@ -75,6 +75,7 @@ function renderGrid(container, roundsWithShots) {
 }
 
 export async function initRoundGrid(session) {
+    const scrollY = window.scrollY;
     const oldContainer = document.getElementById('rounds-container');
     const container = oldContainer.cloneNode(false);
     oldContainer.replaceWith(container);
@@ -102,6 +103,7 @@ export async function initRoundGrid(session) {
     attachGridListeners(container, session, activeBows);
     const stats = await DatabaseService.getSessionStats(session.sessionId);
     updateStatsBar(stats);
+    window.scrollTo(0, scrollY);
 }
 
 function attachGridListeners(container, session, activeBows) {
