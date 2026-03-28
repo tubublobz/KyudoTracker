@@ -59,39 +59,39 @@ const DatabaseService = {
 
         return Promise.all(
             sessions.map(async (s) => {
-                    // Récupérer les tirs
-                    const shots = await db.shots.where('sessionId').equals(s.id).toArray();
+                // Récupérer les tirs
+                const shots = await db.shots.where('sessionId').equals(s.id).toArray();
 
-                    // Filtrer par type de tir
-                    const makiwaraShots = shots.filter(t => t.typeCode === 'maki');
-                    const kintekiShots = shots.filter(t => t.typeCode === 'kinteki28');
-                    const kintekiHits = kintekiShots.filter(t => t.result === true)
+                // Filtrer par type de tir
+                const makiwaraShots = shots.filter(t => t.typeCode === 'maki');
+                const kintekiShots = shots.filter(t => t.typeCode === 'kinteki28');
+                const kintekiHits = kintekiShots.filter(t => t.result === true)
 
-                    // Récupérer le nom de l'arc initial
-                    let bowName = null;
-                    if (s.initialBowId) {
-                        const bow = await db.bows.get(s.initialBowId);
-                        bowName = bow ? bow.name : null;
+                // Récupérer le nom de l'arc initial
+                let bowName = null;
+                if (s.initialBowId) {
+                    const bow = await db.bows.get(s.initialBowId);
+                    bowName = bow ? bow.name : null;
+                }
+
+                // Compter les arcs différents utilisés (autres que l'initial)
+                const uniqueBowIds = [...new Set(shots.map(shot => shot.bowId))];
+                const otherBowsCount = uniqueBowIds.filter(id => id !== s.initialBowId && id !== null).length;
+                return {
+                    id: s.id,
+                    date: s.date,
+                    location: s.location,
+                    type: s.type,
+                    initialBowId: s.initialBowId,
+                    bowName: bowName,
+                    otherBowsCount: otherBowsCount,
+                    stats: {
+                        makiwara: makiwaraShots.length,
+                        kintekiTotal: kintekiShots.length,
+                        kintekiHits: kintekiHits.length
                     }
-
-                    // Compter les arcs différents utilisés (autres que l'initial)
-                    const uniqueBowIds = [...new Set(shots.map(shot => shot.bowId))];
-                    const otherBowsCount = uniqueBowIds.filter(id => id !== s.initialBowId && id !== null).length;
-                    return {
-                        id: s.id,
-                        date: s.date,
-                        location: s.location,
-                        type: s.type,
-                        initialBowId: s.initialBowId,
-                        bowName: bowName,
-                        otherBowsCount: otherBowsCount,
-                        stats: {
-                            makiwara: makiwaraShots.length,
-                            kintekiTotal: kintekiShots.length,
-                            kintekiHits: kintekiHits.length
-                        }
-                    };
-                })
+                };
+            })
         );
     },
 
@@ -262,23 +262,23 @@ const DatabaseService = {
             .equals(sessionId)
             .delete();
     },
-    async getShotsByRound(roundId){
+    async getShotsByRound(roundId) {
         const shots = await db.shots
             .where('shareiId')
             .equals(roundId)
             .sortBy('id');
-        return shots; 
+        return shots;
     },
 
-    async updateShot(shotId, updates){
+    async updateShot(shotId, updates) {
         await db.shots.update(shotId, updates);
     },
 
-    async deleteShotById(shotId){
+    async deleteShotById(shotId) {
         await db.shots.delete(shotId);
     },
 
-// =================== 4 - GESTION DES PASSAGES ================
+    // =================== 4 - GESTION DES PASSAGES ================
 
     async createRound(sessionId) {
         // 1. Calculer l'ordre du prochain passage
@@ -287,12 +287,16 @@ const DatabaseService = {
             .equals(sessionId)
             .count();
 
-        // 2. Créer le passage neutre
+        // 2. Chercher l'arc par défaut parmis les arc actifs
+        const activeBows = await this.getActiveBows();
+        const defaultBow = activeBows.find((bow) => bow.isDefault === true);
+
+        // 3. Créer le passage neutre - avec l'arc par défaut si trouvé
         const round = {
             sessionId: sessionId,
             order: existing + 1,
             isMakiwara: null,
-            bowId: null,
+            bowId: defaultBow ? defaultBow.id : null,
             notes: null
         };
 
@@ -307,11 +311,20 @@ const DatabaseService = {
             .where('sessionId')
             .equals(sessionId)
             .sortBy('order');
-        return rounds;   
+        return rounds;
     },
 
-    async updateRound(roundId, updates){
+    async updateRound(roundId, updates) {
         await db.sharei.update(roundId, updates)
+    },
+
+    async updateRoundBow(roundId, bowId) {
+        // 1. Update le round (sharei)
+        await this.updateRound(roundId, { bowId: bowId });
+        // 2. Récupérer tous les tirs du round
+        const shots = await this.getShotsByRound(roundId);
+        // 3. Update le bowId de chaque tir
+        await Promise.all(shots.map((s) => this.updateShot(s.id, { bowId: bowId })));
     },
 };
 

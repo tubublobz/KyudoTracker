@@ -477,7 +477,12 @@ h2 {
   background: #e8e8e8;
   margin-top: 5px;
 }
-
+.bow-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
 .bow-actions {
   display: flex;
   flex-direction: column;
@@ -923,7 +928,7 @@ h2 {
     background: white;
     border: 1px solid var(--border);
     border-radius: 12px;
-    overflow: hidden;
+    overflow: visible;
     margin-bottom: 6px;
 }
 
@@ -1124,4 +1129,58 @@ h2 {
     letter-spacing: 0.06em;
     margin-top: 1px;
     display: block;
+}
+
+.bow-dropdown {
+    position: absolute;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 100;
+    min-width: 150px;
+    overflow: hidden;
+    margin-top: 4px;
+}
+
+.bow-dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.bow-dropdown-item:hover {
+    background: var(--paper-2);
+}
+
+.bow-dropdown-item:not(:last-child) {
+    border-bottom: 1px solid var(--border);
+}
+.passage-meta {
+    position: relative;
+}
+
+.notes-inline {
+    padding: 0 10px 8px 26px;
+}
+
+.notes-textarea {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 12px;
+    resize: vertical;
+    background: var(--paper-2);
+    color: var(--ink, #1c1917);
+}
+
+.notes-textarea:focus {
+    outline: none;
+    border-color: var(--maki-border);
 }

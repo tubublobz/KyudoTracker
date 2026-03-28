@@ -3,14 +3,13 @@ import { updateStatsBar } from './components.js';
 
 const SHOTS_PER_ROUND = 4;
 
-function renderRound(round, shots = [], isLast = false) {
+function renderRound(round, shots = [], bowName, bowColor, isLast = false) {
     const isNeutral = round.isMakiwara === null;
     const isMaki = round.isMakiwara === true;
 
     let blockClass = 'passage-block';
     if (isMaki) blockClass += ' is-maki';
     if (isLast && isNeutral) blockClass += ' inactive';
-    console.log('round', round.order, 'isLast:', isLast, 'isNeutral:', isNeutral, 'blockClass:', blockClass);
 
     let content = '';
 
@@ -46,15 +45,17 @@ function renderRound(round, shots = [], isLast = false) {
 
     const hasBow = round.bowId !== null;
     const hasNotes = round.notes !== null && round.notes !== '';
-    const bowPill = hasBow
-        ? `<div class="meta-pill filled" data-round-id="${round.id}" data-action="set-bow">🏹 Arc</div>`
+    const bowPill = bowName
+        ? `<div class="meta-pill filled" data-round-id="${round.id}" data-action="set-bow">
+         <span class="bow-dot" style="background-color: ${bowColor}"></span> ${bowName}
+       </div>`
         : `<div class="meta-pill" data-round-id="${round.id}" data-action="set-bow">Arc</div>`;
     const notesPill = hasNotes
         ? `<div class="meta-pill filled" data-round-id="${round.id}" data-action="set-notes">📝 Notes</div>`
         : `<div class="meta-pill" data-round-id="${round.id}" data-action="set-notes">Notes</div>`;
 
     return `
-        <div class="${blockClass}" data-round-id="${round.id}">
+        <div class="${blockClass}" data-round-id="${round.id}" data-bow-id="${round.bowId || ''}">
             <div class="passage-top">
                 <span class="passage-num">${round.order}</span>
                 ${content}
@@ -68,7 +69,7 @@ function renderRound(round, shots = [], isLast = false) {
 
 function renderGrid(container, roundsWithShots) {
     container.innerHTML = roundsWithShots
-        .map(({ round, shots }, index) => renderRound(round, shots, index === roundsWithShots.length - 1))
+        .map(({ round, shots, bowName, bowColor }, index) => renderRound(round, shots, bowName, bowColor, index === roundsWithShots.length - 1))
         .join('');
 }
 
@@ -82,28 +83,35 @@ export async function initRoundGrid(session) {
         const firstRound = await DatabaseService.createRound(session.sessionId);
         rounds = [firstRound];
     }
-
+    const activeBows = await DatabaseService.getActiveBows();
     const roundsWithShots = await Promise.all(
         rounds.map(async (round) => {
             const shots = await DatabaseService.getShotsByRound(round.id);
-            return { round, shots };
+            const bow = activeBows.find((b) => b.id === round.bowId);
+            return {
+                round,
+                shots,
+                bowName: bow ? bow.name : null,
+                bowColor: bow ? bow.color : null
+            };
         })
     );
 
     renderGrid(container, roundsWithShots);
-    attachGridListeners(container, session);
+    attachGridListeners(container, session, activeBows);
     const stats = await DatabaseService.getSessionStats(session.sessionId);
     updateStatsBar(stats);
 }
 
-function attachGridListeners(container, session) {
+function attachGridListeners(container, session, activeBows) {
     container.addEventListener('click', async (e) => {
         const target = e.target;
         const roundId = parseInt(target.dataset.roundId);
         const action = target.dataset.action;
 
         if (!roundId) return;
-
+        const block = target.closest('.passage-block');
+        const bowId = block.dataset.bowId ? parseInt(block.dataset.bowId) : null;
         // 1. Clic sur une case kinteki (shot-btn)
         if (target.classList.contains('shot-btn')) {
             const slot = parseInt(target.dataset.slot);
@@ -115,7 +123,8 @@ function attachGridListeners(container, session) {
                     typeCode: 'kinteki28',
                     shareiId: roundId,
                     slot: slot,
-                    result: true
+                    result: true,
+                    bowId: bowId
                 });
                 // Ligne neutre → kinteki
                 await DatabaseService.updateRound(roundId, { isMakiwara: false });
@@ -136,7 +145,8 @@ function attachGridListeners(container, session) {
             await DatabaseService.updateRound(roundId, { isMakiwara: true });
             await DatabaseService.addShot(session.sessionId, {
                 typeCode: 'maki',
-                shareiId: roundId
+                shareiId: roundId,
+                bowId: bowId
             });
         }
 
@@ -144,7 +154,8 @@ function attachGridListeners(container, session) {
         if (action === 'maki-plus') {
             await DatabaseService.addShot(session.sessionId, {
                 typeCode: 'maki',
-                shareiId: roundId
+                shareiId: roundId,
+                bowId: bowId
             });
         }
 
@@ -160,15 +171,86 @@ function attachGridListeners(container, session) {
                 }
             }
         }
+        // 5. Clic sur pill Arc
+        if (action === 'set-bow') {
+            // a) Fermer un éventuel dropdown déjà ouvert
+            const existing = container.querySelector('.bow-dropdown');
+            if (existing) existing.remove();
 
-        // 5. Après toute interaction → ajouter ligne suivante si nécessaire
+            // b) Construire le dropdown
+            const dropdown = document.createElement('div');
+            dropdown.className = 'bow-dropdown';
+            dropdown.innerHTML = activeBows.map(bow => `
+        <div class="bow-dropdown-item" data-bow-id="${bow.id}">
+            <span class="bow-dot" style="background-color: ${bow.color}"></span> ${bow.name}
+        </div>
+    `).join('');
+
+            // c) Insérer après la pill cliquée
+            target.insertAdjacentElement('afterend', dropdown);
+
+            // d) Écouter les clics sur les choix
+            dropdown.addEventListener('click', async (e) => {
+                const item = e.target.closest('.bow-dropdown-item');
+                if (!item) return;
+                const bowId = parseInt(item.dataset.bowId);
+                await DatabaseService.updateRoundBow(roundId, bowId);
+                await initRoundGrid(session);
+            });
+
+            // e) Fermer au clic extérieur
+            setTimeout(() => {
+                document.addEventListener('click', function closeDropdown(e) {
+                    if (!dropdown.contains(e.target)) {
+                        dropdown.remove();
+                        document.removeEventListener('click', closeDropdown);
+                    }
+                });
+            }, 0);
+
+            return; // Pas de refresh grille !
+        }
+
+        // 6. Clic sur pill Notes
+        if (action === 'set-notes') {
+            // a) Fermer un éventuel dropdown/textarea déjà ouvert
+            const existing = container.querySelector('.notes-inline');
+            if (existing) existing.remove();
+
+            // b) Récupérer les notes actuelles du round
+            const rounds = await DatabaseService.getRounds(session.sessionId);
+            const currentRound = rounds.find(r => r.id === roundId);
+            const currentNotes = currentRound ? currentRound.notes || '' : '';
+
+            // c) Créer le textarea
+            const wrapper = document.createElement('div');
+            wrapper.className = 'notes-inline';
+            wrapper.innerHTML = `<textarea class="notes-textarea" rows="2" placeholder="Notes...">${currentNotes}</textarea>`;
+
+            // d) Insérer après la pill
+            target.insertAdjacentElement('afterend', wrapper);
+
+            // e) Focus automatique
+            const textarea = wrapper.querySelector('textarea');
+            textarea.focus();
+
+            // f) Sauvegarder au blur
+            textarea.addEventListener('blur', async () => {
+                const notes = textarea.value.trim() || null;
+                await DatabaseService.updateRound(roundId, { notes });
+                await initRoundGrid(session);
+            });
+
+            return;
+        }
+        // 7. Après toute interaction → ajouter ligne suivante si nécessaire
         const rounds = await DatabaseService.getRounds(session.sessionId);
         const lastRound = rounds[rounds.length - 1];
         if (lastRound.isMakiwara !== null) {
             await DatabaseService.createRound(session.sessionId);
         }
 
-        // 6. Refresh la grille & stats
+        // 8. Refresh la grille & stats
         const stats = await DatabaseService.getSessionStats(session.sessionId);
         updateStatsBar(stats);
         await initRoundGrid(session);
