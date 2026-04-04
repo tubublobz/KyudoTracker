@@ -17,13 +17,10 @@ function renderRound(round, shots = [], bowName, bowColor, isLast = false) {
     if (isMaki) {
         const count = shots.length;
         content = `
-            <div class="maki-row">
-                <span class="maki-label-txt">🌾 Makiwara</span>
-                <div class="maki-stepper">
-                    <button class="maki-btn" data-round-id="${round.id}" data-action="maki-minus">−</button>
-                    <span class="maki-count">${count}</span>
-                </div>
-                <button class="maki-plus" data-round-id="${round.id}" data-action="maki-plus">+</button>
+            <div class="stepper-full">
+                <button class="maki-btn" data-round-id="${round.id}" data-action="maki-minus">−</button>
+                <span class="maki-count">${count}</span>
+                <button class="maki-btn" data-round-id="${round.id}" data-action="maki-plus">+</button>
             </div>`;
     } else {
         const cases = [];
@@ -55,15 +52,26 @@ function renderRound(round, shots = [], bowName, bowColor, isLast = false) {
         ? `<div class="meta-pill filled" data-round-id="${round.id}" data-action="set-notes">📝 Notes</div>`
         : `<div class="meta-pill" data-round-id="${round.id}" data-action="set-notes">Notes</div>`;
 
-    return `
-        <div class="${blockClass}" data-round-id="${round.id}" data-bow-id="${round.bowId || ''}">
-            <div class="passage-top">
+    const passageMeta = isMaki
+        ? `<div class="passage-meta" style="justify-content: space-between">
+                <div style="display: flex; align-items: center; gap: 6px;">
+                    <span class="passage-num">${round.order}</span>
+                    ${bowPill}
+                    ${notesPill}
+                </div>
+                <span style="color: var(--maki); font-size: 11px; font-weight: 500;">makiwara</span>
+            </div>`
+        : `<div class="passage-meta">
                 <span class="passage-num">${round.order}</span>
-                ${content}
-            </div>
-            <div class="passage-meta">
                 ${bowPill}
                 ${notesPill}
+            </div>`;
+
+    return `
+        <div class="${blockClass}" data-round-id="${round.id}" data-bow-id="${round.bowId || ''}">
+            ${passageMeta}
+            <div class="passage-top">
+                ${content}
             </div>
         </div>`;
 }

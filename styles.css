@@ -625,8 +625,8 @@ h2 {
 .passage-top {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 10px;
+  gap: 10px;
+  padding: 6px 12px 12px 12px;
 }
 
 .passage-num {
@@ -639,20 +639,20 @@ h2 {
 
 .shots {
   display: flex;
-  gap: 5px;
+  gap: 12px;
   flex: 1;
 }
 
 .shot-btn {
-  width: 38px;
-  height: 38px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   border: 1.5px solid var(--border);
   background: var(--paper-2);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
+  font-size: 16px;
   flex-shrink: 0;
   cursor: pointer;
 }
@@ -662,8 +662,8 @@ h2 {
 .shot-btn.void { background: var(--paper-2); border-color: var(--border); }
 
 .maki-trigger {
-  width: 38px;
-  height: 38px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   border: 1.5px dashed var(--maki-border);
   background: transparent;
@@ -697,12 +697,12 @@ h2 {
   border-radius: 20px;
   overflow: hidden;
   background: var(--maki-bg);
-  height: 38px;
+  height: 48px;
 }
 
 .maki-btn {
-  width: 34px;
-  height: 38px;
+  width: 44px;
+  height: 48px;
   border: none;
   background: none;
   font-size: 18px;
@@ -723,8 +723,8 @@ h2 {
 }
 
 .maki-plus {
-  width: 38px;
-  height: 38px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   border: 1.5px solid var(--maki-border);
   background: var(--maki-bg);
@@ -737,11 +737,26 @@ h2 {
   cursor: pointer;
 }
 
+.stepper-full {
+  display: flex;
+  align-items: center;
+  border: 1.5px solid var(--maki-border);
+  border-radius: 12px;
+  height: 36px;
+  width: 100%;
+  overflow: hidden;
+}
+
+.stepper-full .maki-count {
+  flex: 1;
+  text-align: center;
+}
+
 .passage-meta {
   display: flex;
+  align-items: center;
   gap: 6px;
-  padding: 0 10px 8px 26px;
-  position: relative;
+  padding: 8px 10px 0 10px;
 }
 
 .meta-pill {
