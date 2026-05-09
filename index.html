@@ -11,13 +11,17 @@
 </head>
 
 <body>
-  <header class="app-header">
-  </header>
-  <div class="date-banner">
-    <button id="nav-bows-btn" class="btn-icon-nav" title="Mes arcs">🏹</button>
-    <span class="date-banner-label">Séance du</span>
-    <input type="date" id="session-date" class="date-input">
+<header class="app-header">
+  <h1>Kyudo Tracker <span id="app-version" class="version">v0.8.0</span></h1>
+  <div class="nav-toggle">
+    <button id="nav-session-btn" class="nav-toggle-btn active">Séance</button>
+    <button id="nav-bows-btn" class="nav-toggle-btn">Arcs</button>
   </div>
+</header>
+<div class="date-banner" id="date-banner">
+  <span class="date-banner-label">Séance du</span>
+  <input type="date" id="session-date" class="date-input">
+</div>
   <div id="app-container">
     <div id="rounds-container"></div> 
     <div id="round-stats" class="stats-bar"></div>
@@ -36,8 +40,6 @@
     <div id="bows-list" class="bows-list">
       <!-- Les cartes d'arcs seront générées ici -->
     </div>
-
-    <button id="back-from-bows-btn" class="btn-secondary">← Retour</button>
   </div>
 
   <!-- Formulaire arc (modal/overlay) -->

@@ -57,7 +57,7 @@ const DatabaseService = {
 
         if (sessions.length === 0) return [];
 
-        return Promise.all(
+        const enriched = await Promise.all(
             sessions.map(async (s) => {
                 // Récupérer les tirs
                 const shots = await db.shots.where('sessionId').equals(s.id).toArray();
@@ -93,6 +93,7 @@ const DatabaseService = {
                 };
             })
         );
+        return enriched.filter(s => s.stats.makiwara > 0 || s.stats.kintekiTotal > 0);
     },
 
     async getSessionByDate(date) {
