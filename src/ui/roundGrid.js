@@ -182,6 +182,7 @@ function attachGridListeners(container, session, activeBows) {
                 }
             }
         }
+
         // 5. Clic sur pill Arc
         if (action === 'set-bow') {
             // Check : aucun arc disponible → ouvrir l'écran arcs
@@ -211,7 +212,7 @@ function attachGridListeners(container, session, activeBows) {
                 if (!item) return;
                 const bowId = parseInt(item.dataset.bowId);
                 await DatabaseService.updateRoundBow(roundId, bowId);
-                await initRoundGrid(session);
+                await refreshRound(roundId, session, activeBows);
             });
 
             // e) Fermer au clic extérieur
@@ -254,21 +255,51 @@ function attachGridListeners(container, session, activeBows) {
             textarea.addEventListener('blur', async () => {
                 const notes = textarea.value.trim() || null;
                 await DatabaseService.updateRound(roundId, { notes });
-                await initRoundGrid(session);
+                await refreshRound(roundId, session, activeBows);
             });
 
             return;
         }
+
+        await refreshRound(roundId, session, activeBows);
+
         // 7. Après toute interaction → ajouter ligne suivante si nécessaire
         const rounds = await DatabaseService.getRounds(session.sessionId);
-        const lastRound = rounds[rounds.length - 1];
-        if (lastRound.isMakiwara !== null) {
+        const lastRound = rounds.at(-1);
+        const lastRoundIsActive = lastRound.isMakiwara !== null;
+
+        if (lastRoundIsActive) {
             await DatabaseService.createRound(session.sessionId);
+            await initRoundGrid(session);
         }
 
         // 8. Refresh la grille & stats
         const stats = await DatabaseService.getSessionStats(session.sessionId);
-        updateStatsBar(stats);
-        await initRoundGrid(session);
+        updateStatsBar(stats);  
     });
+
+    async function refreshRound(roundId, session, activeBows) {
+    // 1. Récupérer le round depuis la DB
+        const rounds = await DatabaseService.getRounds(session.sessionId);
+        const updatedRound = rounds.find(r => r.id === roundId);
+    
+    // 2. Récupérer les shots du round
+        const roundShots = await DatabaseService.getShotsByRound(updatedRound.id);
+    
+    // 3. Trouver l'arc dans activeBows
+        const bow = activeBows.find(b => b.id === updatedRound.bowId);
+        const bowColor = bow ? bow.color : null ;
+        const bowName = bow ? bow.name : null;
+    
+    // 4. Générer le HTML avec renderRound(...)
+    const isLast = rounds.at(-1).id === roundId;
+    const newHtml = renderRound(updatedRound, roundShots, bowName, bowColor, isLast);
+    const temp = document.createElement('div');
+    temp.innerHTML = newHtml;
+    const newBlock = temp.firstElementChild;
+    // 5. Trouver l'élément DOM existant et le remplacer
+    const oldBlock = container.querySelector(`[data-round-id="${roundId}"]`);
+    oldBlock.replaceWith(newBlock);
+
+    }
 }
