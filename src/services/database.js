@@ -400,13 +400,16 @@ const DatabaseService = {
         await db.shotTypes.clear();
 
         // Réinjecter les données
-        await db.sessions.bulkAdd(data.sessions);
+        const sessions = data.sessions.map(s => ({
+            ...s,
+            date: new Date(s.date)
+        }));
+
+        await db.sessions.bulkAdd(sessions);
         await db.shots.bulkAdd(data.shots);
         await db.sharei.bulkAdd(data.sharei);
         await db.bows.bulkAdd(data.bows);
         await db.shotTypes.bulkAdd(data.shotTypes);
-console.log('bows importés', await db.bows.toArray());
-console.log('shots importés', await db.shots.toArray());
     },
 };
 
