@@ -327,6 +327,87 @@ const DatabaseService = {
         // 3. Update le bowId de chaque tir
         await Promise.all(shots.map((s) => this.updateShot(s.id, { bowId: bowId })));
     },
+
+    // --------- STATS -------
+
+    async getGlobalStats({ days, bowId }) {
+        // 1. Calculer la date limite si days > 0
+        const limitDate = new Date();
+        limitDate.setDate(limitDate.getDate() - days);
+
+        // 2. Récupérer toutes les sessions dans la période
+        const sess = await db.sessions.toArray();
+        const filteredSessions = days !== 0
+            ? sess.filter(s => new Date(s.date) >= limitDate)
+            : sess;
+        // 3. Pour chaque session, récupérer les tirs
+        //    (filtrer par bowId si bowId > 0)
+        const shotsPerSession = await Promise.all(
+            filteredSessions.map(s => db.shots.where('sessionId').equals(s.id).toArray())
+        );
+        const allShots = shotsPerSession.flat();
+        const filteredShots = bowId !== 0
+            ? allShots.filter(s => s.bowId == bowId)
+            : allShots;
+
+        // 4. Agréger et retourner les stats
+        const makiwara = filteredShots.filter(s => s.typeCode == 'maki').length;
+        const kintekiShots = filteredShots.filter(s => s.typeCode == 'kinteki28');
+        const kintekiHits = kintekiShots.filter(s => s.result == true).length;
+        const kintekiTotal = kintekiShots.length;
+        const percent = kintekiTotal > 0 ? Math.round((kintekiHits / kintekiTotal) * 100) : 0;
+        const sessions = bowId !== 0
+            ? filteredSessions.filter(s =>
+                allShots.some(shot => shot.sessionId === s.id && shot.bowId === bowId)
+            )
+            : filteredSessions;
+        return { sessions: sessions.length, makiwara, kintekiHits, kintekiTotal, percent };
+    },
+
+    async exportData() {
+        const sessions = await db.sessions.toArray();
+        const shots = await db.shots.toArray();
+        const sharei = await db.sharei.toArray();
+        const bows = await db.bows.toArray();
+        const shotTypes = await db.shotTypes.toArray();
+
+        const dump = {
+            version: 1,
+            exportedAt: new Date().toISOString(),
+            data: { sessions, shots, sharei, bows, shotTypes }
+        };
+
+        // Créer le fichier et déclencher le téléchargement
+        const blob = new Blob([JSON.stringify(dump, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `kyudo-backup-${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+    },
+    async importData(json) {
+        const { version, data } = json;
+
+        // Validation basique
+        if (!version || !data) throw new Error('Format invalide');
+
+        // Vider les stores existants
+        await db.sessions.clear();
+        await db.shots.clear();
+        await db.sharei.clear();
+        await db.bows.clear();
+        await db.shotTypes.clear();
+
+        // Réinjecter les données
+        await db.sessions.bulkAdd(data.sessions);
+        await db.shots.bulkAdd(data.shots);
+        await db.sharei.bulkAdd(data.sharei);
+        await db.bows.bulkAdd(data.bows);
+        await db.shotTypes.bulkAdd(data.shotTypes);
+console.log('bows importés', await db.bows.toArray());
+console.log('shots importés', await db.shots.toArray());
+    },
 };
 
 export default DatabaseService;

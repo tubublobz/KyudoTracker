@@ -28,19 +28,50 @@
   </div>
 
   <!-- Écran de gestion des arcs -->
-  <div id="bows-screen" style="display:none">
-    <header class="bows-header">
-      <h1>🏹 Mes arcs</h1>
-    </header>
-  
-    <button id="add-bow-btn" class="btn-primary btn-add-bow">
-      + Nouvel arc
-    </button>
+<div id="bows-screen" style="display:none">
 
-    <div id="bows-list" class="bows-list">
-      <!-- Les cartes d'arcs seront générées ici -->
+  <!-- STATS -->
+  <section class="bows-section">
+    <h2>Statistiques</h2>
+    <div class="stats-pills" id="stats-pills">
+      <button class="stats-pill active" data-period="7">7j</button>
+      <button class="stats-pill" data-period="30">30j</button>
+      <button class="stats-pill" data-period="90">3 mois</button>
+      <button class="stats-pill" data-period="0">Tout</button>
     </div>
-  </div>
+    <select id="stats-bow-filter">
+      <option value="0">Tous les arcs</option>
+    </select>
+    <div class="stats-grid" id="stats-grid">
+      <div class="stat-card"><span class="stat-val" id="stat-sessions">—</span><span class="stat-lbl">séances</span></div>
+      <div class="stat-card"><span class="stat-val green" id="stat-percent">—</span><span class="stat-lbl">réussite moy.</span></div>
+      <div class="stat-card"><span class="stat-val" id="stat-kinteki">—</span><span class="stat-lbl">kinteki</span></div>
+      <div class="stat-card"><span class="stat-val teal" id="stat-makiwara">—</span><span class="stat-lbl">makiwara</span></div>
+    </div>
+  </section>
+
+  <hr class="bows-divider">
+
+  <!-- ARCS -->
+  <section class="bows-section">
+    <h2>Mes arcs</h2>
+    <div id="bows-list" class="bows-list"></div>
+    <button id="add-bow-btn" class="btn-primary btn-add-bow">+ Nouvel arc</button>
+  </section>
+
+  <hr class="bows-divider">
+
+  <!-- EXPORT / IMPORT -->
+  <section class="bows-section">
+    <h2>Données</h2>
+    <div class="data-actions">
+      <button id="btn-export" class="btn-data">⬇ Exporter</button>
+      <button id="btn-import" class="btn-data">⬆ Importer</button>
+      <input type="file" id="import-file-input" accept=".json" style="display:none">
+    </div>
+  </section>
+
+</div>
 
   <!-- Formulaire arc (modal/overlay) -->
   <div id="bow-form-overlay" class="overlay">

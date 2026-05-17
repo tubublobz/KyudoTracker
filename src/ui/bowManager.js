@@ -19,9 +19,11 @@ export async function showBowsScreen() {
     document.getElementById('app-container').style.display = 'none';
     document.getElementById('date-banner').style.display = 'none';
     document.getElementById('bows-screen').style.display = 'block';
+    document.querySelector('.history-section').style.display = 'none';
 
     // Charger et afficher la liste des arcs
     await renderBowsList();
+    await initStatsSection();
 }
 
 export function hideBowsScreen() {
@@ -29,6 +31,7 @@ export function hideBowsScreen() {
     document.getElementById('bows-screen').style.display = 'none';
     document.getElementById('date-banner').style.display = 'flex';
     document.getElementById('app-container').style.display = 'flex';
+    document.querySelector('.history-section').style.display = '';
 }
 
 // ==================== LISTE DES ARCS ====================
@@ -61,17 +64,11 @@ function createBowCard(bow) {
                     ${bow.isDefault ? '<span class="default-badge">⭐ Par défaut</span>' : ''}
                 </h3>
                 <p class="bow-meta">
-                    ${bow.strength ? `${bow.strength} kg` : 'Puissance non précisée'}
+                    ${bow.strength ? `${bow.strength} kg` : ''}
                     ${bow.size ? ` • ${bow.size}` : ''}
                     ${bow.isBamboo ? ' • 🎋 Bambou' : ''}
                 </p>
                 ${bow.notes ? `<p class="bow-notes">${bow.notes}</p>` : ''}
-                <span class="bow-status">
-                    ${bow.status === 'new' ? '🆕 Nouveau' : ''}
-                    ${bow.status === 'active' ? '✅ Actif' : ''}
-                    ${bow.status === 'inactive' ? '💤 Inactif' : ''}
-                    ${bow.status === 'deleted' ? '🗑️ Supprimé' : ''}
-                </span>
             </div>
             
             <div class="bow-actions">
@@ -137,18 +134,18 @@ function attachBowCardListeners() {
 
 function toggleKebabMenu(bowId) {
     const menu = document.querySelector(`.kebab-menu[data-bow-id="${bowId}"]`);
-    
+
     // Si ce menu est déjà ouvert, le fermer
     if (!menu.classList.contains('hidden')) {
         menu.classList.add('hidden');
         return;
     }
-    
+
     // Sinon, fermer tous les autres et ouvrir celui-ci
     document.querySelectorAll('.kebab-menu').forEach(m => {
         m.classList.add('hidden');
     });
-    
+
     menu.classList.remove('hidden');
 }
 
@@ -335,7 +332,7 @@ export function initBowManager(onReturn) {
         };
         saveBow(formData);
     });
-    
+
     // Color picker natif - déselectionner les pastilles si on choisit une couleur custom
     document.getElementById('bow-color').addEventListener('input', (e) => {
         const customColor = e.target.value;
@@ -350,4 +347,79 @@ export function initBowManager(onReturn) {
     });
     document.getElementById('cancel-bow-form').addEventListener('click', closeBowForm);
 
+    document.getElementById('btn-export').addEventListener('click', async () => {
+        await DatabaseService.exportData();
+        setTimeout(() => showNotification('Export réussi !', 'success'), 500);
+    });
+
+    document.getElementById('btn-import').addEventListener('click', () => {
+        document.getElementById('import-file-input').click();
+    });
+
+    document.getElementById('import-file-input').addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const confirmed = confirm('⚠️ Importer ce fichier va remplacer toutes tes données actuelles. Continuer ?');
+        if (!confirmed) return;
+
+        try {
+            const text = await file.text();
+            const json = JSON.parse(text);
+            await DatabaseService.importData(json);
+            showNotification('Import réussi !', 'success');
+        } catch (err) {
+            console.error(err);
+            showNotification('Erreur lors de l\'import', 'error');
+        } finally {
+            // Réinitialiser l'input pour permettre de reimporter le même fichier
+            e.target.value = '';
+        }
+    });
+}
+
+
+// =============== STATS =============
+async function refreshStats(days, bowId) {
+    const stats = await DatabaseService.getGlobalStats({ days, bowId });
+    document.getElementById('stat-sessions').textContent = stats.sessions;
+    document.getElementById('stat-percent').textContent = stats.kintekiTotal > 0 ? stats.percent + '%' : '—';
+    document.getElementById('stat-kinteki').textContent = stats.kintekiTotal;
+    document.getElementById('stat-makiwara').textContent = stats.makiwara;
+}
+
+async function initStatsSection() {
+    // 1. Peupler le dropdown avec les arcs actifs
+    const bows = await DatabaseService.getActiveBows();
+    const select = document.getElementById('stats-bow-filter');
+    select.innerHTML = '<option value="0">Tous les arcs</option>';
+
+    bows.forEach(bow => {
+        const option = document.createElement('option');
+        option.value = bow.id;
+        option.textContent = bow.name;
+        select.appendChild(option);
+    });
+
+    // 2. Afficher les stats par défaut (7j, tous les arcs)
+    await refreshStats(7, 0);
+
+    // 3. Écouter les pills
+    document.getElementById('stats-pills').addEventListener('click', async (e) => {
+        const pill = e.target.closest('.stats-pill');
+        if (!pill) return;
+        document.querySelectorAll('.stats-pill').forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        const days = parseInt(pill.dataset.period);
+        const bowId = parseInt(select.value);
+        await refreshStats(days, bowId);
+    });
+
+    // 4. Écouter le dropdown
+    select.addEventListener('change', async () => {
+        const activePill = document.querySelector('.stats-pill.active');
+        const days = parseInt(activePill.dataset.period);
+        const bowId = parseInt(select.value);
+        await refreshStats(days, bowId);
+    });
 }
