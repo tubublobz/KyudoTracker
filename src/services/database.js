@@ -61,6 +61,7 @@ const DatabaseService = {
             sessions.map(async (s) => {
                 // Récupérer les tirs
                 const shots = await db.shots.where('sessionId').equals(s.id).toArray();
+                const rounds = await this.getRounds(s.id);
 
                 // Filtrer par type de tir
                 const makiwaraShots = shots.filter(t => t.typeCode === 'maki');
@@ -68,15 +69,18 @@ const DatabaseService = {
                 const kintekiHits = kintekiShots.filter(t => t.result === true)
 
                 // Récupérer le nom de l'arc initial
+                const firstRoundWithBow = rounds.find(r => r.bowId !== null);
                 let bowName = null;
-                if (s.initialBowId) {
-                    const bow = await db.bows.get(s.initialBowId);
+                if (firstRoundWithBow) {
+                    const bow = await db.bows.get(firstRoundWithBow.bowId);
                     bowName = bow ? bow.name : null;
                 }
 
                 // Compter les arcs différents utilisés (autres que l'initial)
-                const uniqueBowIds = [...new Set(shots.map(shot => shot.bowId))];
-                const otherBowsCount = uniqueBowIds.filter(id => id !== s.initialBowId && id !== null).length;
+                const uniqueBowIds = [...new Set(rounds.map(r => r.bowId).filter(id => id !== null))];
+                const otherBowsCount = firstRoundWithBow
+                    ? uniqueBowIds.filter(id => id !== firstRoundWithBow.bowId).length
+                    : 0;
                 return {
                     id: s.id,
                     date: s.date,
