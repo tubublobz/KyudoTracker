@@ -356,13 +356,14 @@ const DatabaseService = {
         const kintekiHits = kintekiShots.filter(s => s.result == true).length;
         const kintekiTotal = kintekiShots.length;
         const percent = kintekiTotal > 0 ? Math.round((kintekiHits / kintekiTotal) * 100) : 0;
-        const sessions = bowId !== 0
-            ? filteredSessions.filter(s =>
-                allShots.some(shot => shot.sessionId === s.id && shot.bowId === bowId)
-            )
-            : filteredSessions;
+        const sessions = filteredSessions.filter(s =>
+            allShots.some(shot => shot.sessionId === s.id && (bowId === 0 || shot.bowId === bowId))
+        );
         return { sessions: sessions.length, makiwara, kintekiHits, kintekiTotal, percent };
     },
+
+    // ------------ IMPORT & EXPORT ----------
+
 
     async exportData() {
         const sessions = await db.sessions.toArray();
